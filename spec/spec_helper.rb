@@ -31,12 +31,4 @@ Spec::Runner.configure do |config|
     end
   end
 
-  config.before(:each) do
-    ActiveRecord::Base.connection.execute %{
-      TRUNCATE TABLE test_models;
-      SELECT setval('test_models_id_seq', 1, false);
-}
-    TestModel.create :data => 'test data 1'
-  end
-
 end
