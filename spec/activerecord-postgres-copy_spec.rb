@@ -1,7 +1,25 @@
 require File.expand_path(File.dirname(__FILE__) + '/spec_helper')
 
-describe "ActiverecordPostgresCopy" do
-  it "fails" do
-    fail "hey buddy, you should probably rename this file and start specing for real"
+describe "ActiveRecordPostgresCopy" do
+  it "should copy and pass data to block if block is given and no path is passed" do
+    File.open('spec/fixtures/semicolon_with_header.csv', 'r') do |f|
+      TestModel.pg_copy_to do |row|
+        row.should == f.readline
+      end
+    end
+  end
+  it "should copy to disk if block is not given and a path is passed" do
+    TestModel.pg_copy_to '/tmp/export.csv'
+    File.open('spec/fixtures/semicolon_with_header.csv', 'r') do |fixture|
+      File.open('/tmp/export.csv', 'r') do |result|
+        result.read.should == fixture.read
+      end
+    end
+  end
+  it "should raise exception if I pass a path and a block simultaneously" do
+    lambda do
+      TestModel.pg_copy_to('/tmp/bogus_path') do |row|
+      end
+    end.should raise_error
   end
 end
