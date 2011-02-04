@@ -17,9 +17,8 @@ module ActiveRecord
       if path_or_io.instance_of? String
         connection.execute "COPY #{quoted_table_name} FROM #{sanitize(path_or_io)} WITH DELIMITER '#{options[:delimiter]}' CSV HEADER"
       else
-        connection.execute "COPY #{quoted_table_name} FROM STDIN WITH DELIMITER '#{options[:delimiter]}' CSV HEADER"
+        connection.execute "COPY #{quoted_table_name} FROM STDIN WITH DELIMITER '#{options[:delimiter]}' CSV"
         line = path_or_io.gets
-        connection.raw_connection.put_copy_data line
         header = line.strip.split(options[:delimiter])
         while line = path_or_io.gets do
           if block_given?

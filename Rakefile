@@ -5,8 +5,8 @@ begin
   require 'jeweler'
   Jeweler::Tasks.new do |gem|
     gem.name = "activerecord-postgres-copy"
-    gem.summary = %Q{TODO: one-line summary of your gem}
-    gem.description = %Q{TODO: longer description of your gem}
+    gem.summary = %Q{Put COPY command functionality in ActiveRecord's model class}
+    gem.description = %Q{Now you can use the super fast COPY for import/export data directly from your AR models.}
     gem.email = "diogob@gmail.com"
     gem.homepage = "http://github.com/diogob/activerecord-postgres-copy"
     gem.authors = ["Diogo Biazus"]
