@@ -17,5 +17,15 @@ describe "COPY FROM" do
     TestModel.pg_copy_from File.open(File.expand_path('spec/fixtures/tab_with_header.csv'), 'r')
     TestModel.order(:id).all.map{|r| r.attributes}.should == [{'id' => 1, 'data' => 'test data 1'}]
   end
+
+  it "should import with custom delimiter from path" do
+    TestModel.pg_copy_from File.expand_path('spec/fixtures/semicolon_with_header.csv'), :delimiter => ';'
+    TestModel.order(:id).all.map{|r| r.attributes}.should == [{'id' => 1, 'data' => 'test data 1'}]
+  end
+
+  it "should import with custom delimiter from IO" do
+    TestModel.pg_copy_from File.open(File.expand_path('spec/fixtures/semicolon_with_header.csv'), 'r'), :delimiter => ';'
+    TestModel.order(:id).all.map{|r| r.attributes}.should == [{'id' => 1, 'data' => 'test data 1'}]
+  end
 end
 
