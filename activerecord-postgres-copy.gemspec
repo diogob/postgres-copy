@@ -25,6 +25,7 @@ Gem::Specification.new do |s|
      "README.md",
      "Rakefile",
      "VERSION",
+     "activerecord-postgres-copy.gemspec",
      "lib/activerecord-postgres-copy.rb",
      "lib/activerecord-postgres-copy/base.rb",
      "spec/fixtures/semicolon_with_header.csv",
