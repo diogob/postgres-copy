@@ -14,7 +14,7 @@ GEM
     arel (2.0.6)
     builder (2.1.2)
     i18n (0.5.0)
-    pg (0.9.0)
+    pg (0.10.1)
     tzinfo (0.3.23)
 
 PLATFORMS
