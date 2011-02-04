@@ -10,7 +10,7 @@ describe "COPY TO" do
   end
 
   it "should copy and pass data to block if block is given and no path is passed" do
-    File.open('spec/fixtures/semicolon_with_header.csv', 'r') do |f|
+    File.open('spec/fixtures/tab_with_header.csv', 'r') do |f|
       TestModel.pg_copy_to do |row|
         row.should == f.readline
       end
@@ -19,7 +19,7 @@ describe "COPY TO" do
 
   it "should copy to disk if block is not given and a path is passed" do
     TestModel.pg_copy_to '/tmp/export.csv'
-    File.open('spec/fixtures/semicolon_with_header.csv', 'r') do |fixture|
+    File.open('spec/fixtures/tab_with_header.csv', 'r') do |fixture|
       File.open('/tmp/export.csv', 'r') do |result|
         result.read.should == fixture.read
       end

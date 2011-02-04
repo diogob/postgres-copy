@@ -12,12 +12,14 @@ module ActiveRecord
       end
       return self
     end
-    def self.pg_copy_from path_or_io, field_map = nil
+
+    def self.pg_copy_from path_or_io, options = {:delimiter => "\t"}
       if path_or_io.instance_of? String
-        connection.execute "COPY #{quoted_table_name} FROM #{sanitize(path_or_io)} WITH DELIMITER '\t' CSV HEADER"
+        connection.execute "COPY #{quoted_table_name} FROM #{sanitize(path_or_io)} WITH DELIMITER '#{options[:delimiter]}' CSV HEADER"
       else
-        connection.execute "COPY #{quoted_table_name} FROM STDIN WITH DELIMITER '\t' CSV HEADER"
+        connection.execute "COPY #{quoted_table_name} FROM STDIN WITH DELIMITER '#{options[:delimiter]}' CSV HEADER"
         while line = path_or_io.gets do
+          yield(line) if block_given?
           connection.raw_connection.put_copy_data line
         end
         connection.raw_connection.put_copy_end
