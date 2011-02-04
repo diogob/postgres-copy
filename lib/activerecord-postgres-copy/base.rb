@@ -18,8 +18,15 @@ module ActiveRecord
         connection.execute "COPY #{quoted_table_name} FROM #{sanitize(path_or_io)} WITH DELIMITER '#{options[:delimiter]}' CSV HEADER"
       else
         connection.execute "COPY #{quoted_table_name} FROM STDIN WITH DELIMITER '#{options[:delimiter]}' CSV HEADER"
+        line = path_or_io.gets
+        connection.raw_connection.put_copy_data line
+        header = line.strip.split(options[:delimiter])
         while line = path_or_io.gets do
-          yield(line) if block_given?
+          if block_given?
+            row = line.strip.split(options[:delimiter])
+            yield(row)
+            line = row.join(options[:delimiter])
+          end
           connection.raw_connection.put_copy_data line
         end
         connection.raw_connection.put_copy_end
