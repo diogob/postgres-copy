@@ -34,5 +34,10 @@ describe "COPY FROM" do
     end
     TestModel.order(:id).all.map{|r| r.attributes}.should == [{'id' => 1, 'data' => 'changed this data'}]
   end
+
+  it "should be able to copy from using custom set of columns" do
+    TestModel.pg_copy_from(File.open(File.expand_path('spec/fixtures/tab_only_data.csv'), 'r'), :columns => ["data"])
+    TestModel.order(:id).all.map{|r| r.attributes}.should == [{'id' => 1, 'data' => 'test data 1'}]
+  end
 end
 

@@ -13,11 +13,13 @@ module ActiveRecord
       return self
     end
 
-    def self.pg_copy_from path_or_io, options = {:delimiter => "\t"}
+    def self.pg_copy_from path_or_io, options = {}
+      options = {:delimiter => "\t"}.merge(options)
+      columns = options[:columns] ? "(#{options[:columns].join(",")})" : ''
       if path_or_io.instance_of? String
-        connection.execute "COPY #{quoted_table_name} FROM #{sanitize(path_or_io)} WITH DELIMITER '#{options[:delimiter]}' CSV HEADER"
+        connection.execute "COPY #{quoted_table_name} #{columns} FROM #{sanitize(path_or_io)} WITH DELIMITER '#{options[:delimiter]}' CSV HEADER"
       else
-        connection.execute "COPY #{quoted_table_name} FROM STDIN WITH DELIMITER '#{options[:delimiter]}' CSV"
+        connection.execute "COPY #{quoted_table_name} #{columns} FROM STDIN WITH DELIMITER '#{options[:delimiter]}' CSV"
         line = path_or_io.gets
         header = line.strip.split(options[:delimiter])
         while line = path_or_io.gets do
