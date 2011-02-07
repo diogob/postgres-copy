@@ -59,5 +59,12 @@ describe "COPY FROM" do
     TestModel.pg_copy_from(File.open(File.expand_path('spec/fixtures/tab_with_extra_line.csv'), 'r'))
     TestModel.order(:id).all.map{|r| r.attributes}.should == [{'id' => 1, 'data' => 'test data 1'}]
   end
+
+  it "should raise error in malformed files" do
+    lambda do
+      TestModel.pg_copy_from(File.open(File.expand_path('spec/fixtures/tab_with_error.csv'), 'r'))
+    end.should raise_error
+    TestModel.order(:id).all.map{|r| r.attributes}.should == []
+  end
 end
 
