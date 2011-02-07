@@ -39,5 +39,10 @@ describe "COPY FROM" do
     TestModel.pg_copy_from(File.open(File.expand_path('spec/fixtures/tab_only_data.csv'), 'r'), :columns => ["data"])
     TestModel.order(:id).all.map{|r| r.attributes}.should == [{'id' => 1, 'data' => 'test data 1'}]
   end
+
+  it "default set of columns should be all table columns minus [id, created_at, updated_at]" do
+    ExtraField.pg_copy_from(File.open(File.expand_path('spec/fixtures/tab_with_header.csv'), 'r'))
+    ExtraField.order(:id).all.map{|r| r.attributes}.should == [{'id' => 1, 'data' => 'test data 1', 'created_at' => nil, 'updated_at' => nil}]
+  end
 end
 

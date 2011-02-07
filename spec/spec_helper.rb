@@ -1,6 +1,7 @@
 $LOAD_PATH.unshift(File.dirname(__FILE__))
 $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
 require 'fixtures/test_model'
+require 'fixtures/extra_field'
 require 'spec'
 require 'spec/autorun'
 
@@ -17,7 +18,9 @@ Spec::Runner.configure do |config|
       ActiveRecord::Base.connection.execute %{
         SET client_min_messages TO warning;
         DROP TABLE IF EXISTS test_models; 
+        DROP TABLE IF EXISTS extra_fields; 
         CREATE TABLE test_models (id serial PRIMARY KEY, data text);
+        CREATE TABLE extra_fields (id serial PRIMARY KEY, data text, created_at timestamp, updated_at timestamp);
 }
     rescue Exception => e
       puts "RESCUE"

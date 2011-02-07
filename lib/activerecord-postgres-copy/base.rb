@@ -15,23 +15,19 @@ module ActiveRecord
 
     def self.pg_copy_from path_or_io, options = {}
       options = {:delimiter => "\t"}.merge(options)
-      columns = options[:columns] ? "(#{options[:columns].join(",")})" : ''
-      if path_or_io.instance_of? String
-        connection.execute "COPY #{quoted_table_name} #{columns} FROM #{sanitize(path_or_io)} WITH DELIMITER '#{options[:delimiter]}' CSV HEADER"
-      else
-        connection.execute "COPY #{quoted_table_name} #{columns} FROM STDIN WITH DELIMITER '#{options[:delimiter]}' CSV"
-        line = path_or_io.gets
-        header = line.strip.split(options[:delimiter])
-        while line = path_or_io.gets do
-          if block_given?
-            row = line.strip.split(options[:delimiter])
-            yield(row)
-            line = row.join(options[:delimiter])
-          end
-          connection.raw_connection.put_copy_data line
+      io = path_or_io.instance_of?(String) ? File.open(path_or_io, 'r') : path_or_io
+      line = io.gets
+      columns_list = options[:columns] || line.strip.split(options[:delimiter])
+      connection.execute "COPY #{quoted_table_name} (#{columns_list.join(",")}) FROM STDIN WITH DELIMITER '#{options[:delimiter]}' CSV"
+      while line = io.gets do
+        if block_given?
+          row = line.strip.split(options[:delimiter])
+          yield(row)
+          line = row.join(options[:delimiter])
         end
-        connection.raw_connection.put_copy_end
+        connection.raw_connection.put_copy_data line
       end
+      connection.raw_connection.put_copy_end
     end
   end
 end
