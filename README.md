@@ -1,6 +1,19 @@
 # activerecord-postgres-copy
 
-Description goes here.
+This Gem will enable your AR models to use the PostgreSQL COPY command to import/export data in CSV format.
+It's still in its ealry stages of development, *not production ready*.
+
+## Install
+
+    gem install activerecord-postgres-copy
+
+## Usage
+
+The gem will add two aditiontal class methods to ActiveRecord::Base as a monkey patch (I'll change this soon):
+
+* pg_copy_to (description yet to be added)
+* pg_copy_from (description yet to be added)
+
 
 ## Note on Patches/Pull Requests
  

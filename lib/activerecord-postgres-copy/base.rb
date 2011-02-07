@@ -16,6 +16,7 @@ module ActiveRecord
     def self.pg_copy_from path_or_io, options = {}
       options = {:delimiter => "\t"}.merge(options)
       io = path_or_io.instance_of?(String) ? File.open(path_or_io, 'r') : path_or_io
+      # The first line should be always the HEADER.
       line = io.gets
       columns_list = options[:columns] || line.strip.split(options[:delimiter])
       connection.execute "COPY #{quoted_table_name} (#{columns_list.join(",")}) FROM STDIN WITH DELIMITER '#{options[:delimiter]}' CSV"
