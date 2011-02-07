@@ -49,5 +49,10 @@ describe "COPY FROM" do
     TestModel.pg_copy_from(File.open(File.expand_path('spec/fixtures/tab_with_different_header.csv'), 'r'), :map => {'cod' => 'id', 'info' => 'data'})
     TestModel.order(:id).all.map{|r| r.attributes}.should == [{'id' => 1, 'data' => 'test data 1'}]
   end
+
+  it "should be able to map the header in the file to diferent column names with custom delimiter" do
+    TestModel.pg_copy_from(File.open(File.expand_path('spec/fixtures/semicolon_with_different_header.csv'), 'r'), :delimiter => ';', :map => {'cod' => 'id', 'info' => 'data'})
+    TestModel.order(:id).all.map{|r| r.attributes}.should == [{'id' => 1, 'data' => 'test data 1'}]
+  end
 end
 
