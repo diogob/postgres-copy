@@ -19,6 +19,7 @@ module ActiveRecord
       # The first line should be always the HEADER.
       line = io.gets
       columns_list = options[:columns] || line.strip.split(options[:delimiter])
+      columns_list = columns_list.map{|c| options[:map][c.to_s] } if options[:map]
       connection.execute "COPY #{quoted_table_name} (#{columns_list.join(",")}) FROM STDIN WITH DELIMITER '#{options[:delimiter]}' CSV"
       while line = io.gets do
         if block_given?
