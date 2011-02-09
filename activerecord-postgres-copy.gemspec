@@ -9,7 +9,7 @@ Gem::Specification.new do |s|
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Diogo Biazus"]
-  s.date = %q{2011-02-07}
+  s.date = %q{2011-02-09}
   s.description = %q{Now you can use the super fast COPY for import/export data directly from your AR models.}
   s.email = %q{diogob@gmail.com}
   s.extra_rdoc_files = [
@@ -60,11 +60,14 @@ Gem::Specification.new do |s|
 
     if Gem::Version.new(Gem::VERSION) >= Gem::Version.new('1.2.0') then
       s.add_development_dependency(%q<rspec>, [">= 1.2.9"])
+      s.add_runtime_dependency(%q<activerecord>, [">= 3.0.0"])
     else
       s.add_dependency(%q<rspec>, [">= 1.2.9"])
+      s.add_dependency(%q<activerecord>, [">= 3.0.0"])
     end
   else
     s.add_dependency(%q<rspec>, [">= 1.2.9"])
+    s.add_dependency(%q<activerecord>, [">= 3.0.0"])
   end
 end
 
