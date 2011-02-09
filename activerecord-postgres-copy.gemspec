@@ -5,7 +5,7 @@
 
 Gem::Specification.new do |s|
   s.name = %q{activerecord-postgres-copy}
-  s.version = "0.2.1"
+  s.version = "0.2.2"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Diogo Biazus"]
@@ -33,6 +33,7 @@ Gem::Specification.new do |s|
      "spec/fixtures/semicolon_with_header.csv",
      "spec/fixtures/tab_only_data.csv",
      "spec/fixtures/tab_with_different_header.csv",
+     "spec/fixtures/tab_with_error.csv",
      "spec/fixtures/tab_with_extra_line.csv",
      "spec/fixtures/tab_with_header.csv",
      "spec/fixtures/test_model.rb",
