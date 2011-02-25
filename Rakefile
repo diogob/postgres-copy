@@ -4,11 +4,11 @@ require 'rake'
 begin
   require 'jeweler'
   Jeweler::Tasks.new do |gem|
-    gem.name = "activerecord-postgres-copy"
+    gem.name = "postgres-copy"
     gem.summary = %Q{Put COPY command functionality in ActiveRecord's model class}
     gem.description = %Q{Now you can use the super fast COPY for import/export data directly from your AR models.}
     gem.email = "diogob@gmail.com"
-    gem.homepage = "http://github.com/diogob/activerecord-postgres-copy"
+    gem.homepage = "http://github.com/diogob/postgres-copy"
     gem.authors = ["Diogo Biazus"]
     gem.add_development_dependency "rspec", ">= 1.2.9"
     gem.add_dependency "activerecord", ">= 3.0.0"
