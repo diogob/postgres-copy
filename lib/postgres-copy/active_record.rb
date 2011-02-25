@@ -12,6 +12,13 @@ module ActiveRecord
       end
       return self
     end
+    
+    def self.pg_copy_to_string
+      # It would be cool to work like an Enumerable
+      data = ''
+      self.pg_copy_to{|l| data += l }
+      data
+    end
 
     def self.pg_copy_from path_or_io, options = {}
       options = {:delimiter => "\t"}.merge(options)

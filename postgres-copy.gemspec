@@ -4,7 +4,7 @@
 # -*- encoding: utf-8 -*-
 
 Gem::Specification.new do |s|
-  s.name = %q{activerecord-postgres-copy}
+  s.name = %q{postgres-copy}
   s.version = "0.2.2"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
@@ -25,9 +25,9 @@ Gem::Specification.new do |s|
      "README.md",
      "Rakefile",
      "VERSION",
-     "activerecord-postgres-copy.gemspec",
-     "lib/activerecord-postgres-copy.rb",
-     "lib/activerecord-postgres-copy/base.rb",
+     "postgres-copy.gemspec",
+     "lib/postgres-copy.rb",
+     "lib/postgres-copy/base.rb",
      "spec/fixtures/extra_field.rb",
      "spec/fixtures/semicolon_with_different_header.csv",
      "spec/fixtures/semicolon_with_header.csv",
@@ -42,7 +42,7 @@ Gem::Specification.new do |s|
      "spec/spec.opts",
      "spec/spec_helper.rb"
   ]
-  s.homepage = %q{http://github.com/diogob/activerecord-postgres-copy}
+  s.homepage = %q{http://github.com/diogob/postgres-copy}
   s.rdoc_options = ["--charset=UTF-8"]
   s.require_paths = ["lib"]
   s.rubygems_version = %q{1.3.7}
