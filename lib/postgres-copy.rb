@@ -1,6 +1,6 @@
-# require 'rubygems'
-# require 'active_record'
-# require 'activerecord-postgres-copy/base'
+require 'rubygems'
+require 'active_record'
+require 'postgres-copy/active_record'
 require 'rails'
 
 class PostgresCopy < Rails::Railtie

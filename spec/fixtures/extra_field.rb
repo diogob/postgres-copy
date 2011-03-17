@@ -1,4 +1,4 @@
-require 'activerecord-postgres-copy'
+require 'postgres-copy'
 
 class ExtraField < ActiveRecord::Base
 end

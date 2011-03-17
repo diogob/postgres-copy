@@ -1,4 +1,4 @@
-require 'activerecord-postgres-copy'
+require 'postgres-copy'
 
 class TestModel < ActiveRecord::Base
 end
