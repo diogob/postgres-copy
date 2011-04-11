@@ -2,3 +2,7 @@ source :gemcutter
 
 gem 'pg'
 gem 'activerecord'
+gem 'rails'
+gem 'rake'
+gem 'rspec', '~> 2.5'
+gem 'rspec-core', '~> 2.5'

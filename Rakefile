@@ -19,26 +19,16 @@ rescue LoadError
   puts "Jeweler (or a dependency) not available. Install it with: gem install jeweler"
 end
 
-require 'spec/rake/spectask'
-Spec::Rake::SpecTask.new(:spec) do |spec|
-  spec.libs << 'lib' << 'spec'
-  spec.spec_files = FileList['spec/**/*_spec.rb']
+require "rspec/core/rake_task" # RSpec 2.0
+RSpec::Core::RakeTask.new(:spec) do |spec|
+  spec.pattern = 'spec/*_spec.rb'
+  spec.rspec_opts = ["--backtrace", "--color", "--format progress", "-r ./spec/spec_helper.rb"]
 end
-
-Spec::Rake::SpecTask.new(:rcov) do |spec|
-  spec.libs << 'lib' << 'spec'
-  spec.pattern = 'spec/**/*_spec.rb'
-  spec.rcov = true
-end
-
-task :spec => :check_dependencies
-
 task :default => :spec
 
 require 'rake/rdoctask'
 Rake::RDocTask.new do |rdoc|
   version = File.exist?('VERSION') ? File.read('VERSION') : ""
-
   rdoc.rdoc_dir = 'rdoc'
   rdoc.title = "activerecord-postgres-copy #{version}"
   rdoc.rdoc_files.include('README*')

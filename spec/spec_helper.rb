@@ -2,10 +2,10 @@ $LOAD_PATH.unshift(File.dirname(__FILE__))
 $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
 require 'fixtures/test_model'
 require 'fixtures/extra_field'
-require 'spec'
-require 'spec/autorun'
+require 'rspec'
+require 'rspec/autorun'
 
-Spec::Runner.configure do |config|
+RSpec.configure do |config|
   config.before(:suite) do
     # we create a test database if it does not exist
     # I do not use database users or password for the tests, using ident authentication instead
