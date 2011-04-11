@@ -35,6 +35,14 @@ describe "COPY FROM" do
     TestModel.order(:id).all.map{|r| r.attributes}.should == [{'id' => 1, 'data' => 'changed this data'}]
   end
 
+  it "should import 2 lines and allow changes in block" do
+    TestModel.pg_copy_from(File.open(File.expand_path('spec/fixtures/tab_with_two_lines.csv'), 'r')) do |row|
+      row[1] = 'changed this data'
+    end
+    TestModel.order(:id).first.attributes.should == {'id' => 1, 'data' => 'changed this data'}
+    TestModel.count.should == 2
+  end
+
   it "should be able to copy from using custom set of columns" do
     TestModel.pg_copy_from(File.open(File.expand_path('spec/fixtures/tab_only_data.csv'), 'r'), :columns => ["data"])
     TestModel.order(:id).all.map{|r| r.attributes}.should == [{'id' => 1, 'data' => 'test data 1'}]

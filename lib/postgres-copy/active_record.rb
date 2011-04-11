@@ -33,7 +33,7 @@ module ActiveRecord
         if block_given?
           row = line.strip.split(options[:delimiter])
           yield(row)
-          line = row.join(options[:delimiter])
+          line = row.join(options[:delimiter]) + "\n"
         end
         connection.raw_connection.put_copy_data line
       end
