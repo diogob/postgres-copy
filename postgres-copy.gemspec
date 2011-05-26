@@ -50,14 +50,6 @@ Gem::Specification.new do |s|
   s.require_paths = ["lib"]
   s.rubygems_version = %q{1.7.2}
   s.summary = %q{Put COPY command functionality in ActiveRecord's model class}
-  s.test_files = [
-    "spec/fixtures/extra_field.rb",
-    "spec/fixtures/reserved_word_model.rb",
-    "spec/fixtures/test_model.rb",
-    "spec/pg_copy_from_spec.rb",
-    "spec/pg_copy_to_spec.rb",
-    "spec/spec_helper.rb"
-  ]
 
   if s.respond_to? :specification_version then
     s.specification_version = 3
