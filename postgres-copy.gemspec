@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{postgres-copy}
-  s.version = "0.3.3"
+  s.version = "0.3.4"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Diogo Biazus"]
-  s.date = %q{2011-04-11}
+  s.date = %q{2011-05-26}
   s.description = %q{Now you can use the super fast COPY for import/export data directly from your AR models.}
   s.email = %q{diogob@gmail.com}
   s.extra_rdoc_files = [
@@ -30,6 +30,8 @@ Gem::Specification.new do |s|
     "lib/postgres-copy/zip_responder.rb",
     "postgres-copy.gemspec",
     "spec/fixtures/extra_field.rb",
+    "spec/fixtures/reserved_word_model.rb",
+    "spec/fixtures/reserved_words.csv",
     "spec/fixtures/semicolon_with_different_header.csv",
     "spec/fixtures/semicolon_with_header.csv",
     "spec/fixtures/tab_only_data.csv",
@@ -46,10 +48,11 @@ Gem::Specification.new do |s|
   ]
   s.homepage = %q{http://github.com/diogob/postgres-copy}
   s.require_paths = ["lib"]
-  s.rubygems_version = %q{1.3.7}
+  s.rubygems_version = %q{1.7.2}
   s.summary = %q{Put COPY command functionality in ActiveRecord's model class}
   s.test_files = [
     "spec/fixtures/extra_field.rb",
+    "spec/fixtures/reserved_word_model.rb",
     "spec/fixtures/test_model.rb",
     "spec/pg_copy_from_spec.rb",
     "spec/pg_copy_to_spec.rb",
@@ -57,7 +60,6 @@ Gem::Specification.new do |s|
   ]
 
   if s.respond_to? :specification_version then
-    current_version = Gem::Specification::CURRENT_SPECIFICATION_VERSION
     s.specification_version = 3
 
     if Gem::Version.new(Gem::VERSION) >= Gem::Version.new('1.2.0') then
