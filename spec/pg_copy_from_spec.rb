@@ -74,5 +74,10 @@ describe "COPY FROM" do
     end.should raise_error
     TestModel.order(:id).all.map{|r| r.attributes}.should == []
   end
+
+  it "should copy from even when table fields need identifier quoting" do
+    ReservedWordModel.pg_copy_from File.expand_path('spec/fixtures/reserved_words.csv')
+    ReservedWordModel.order(:id).all.map{|r| r.attributes}.should == [{"group"=>"group name", "id"=>1, "select"=>"test select"}]
+  end
 end
 
