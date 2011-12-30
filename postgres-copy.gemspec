@@ -4,20 +4,21 @@
 # -*- encoding: utf-8 -*-
 
 Gem::Specification.new do |s|
-  s.name = %q{postgres-copy}
-  s.version = "0.3.5"
+  s.name = "postgres-copy"
+  s.version = "0.3.6"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Diogo Biazus"]
-  s.date = %q{2011-07-14}
-  s.description = %q{Now you can use the super fast COPY for import/export data directly from your AR models.}
-  s.email = %q{diogob@gmail.com}
+  s.date = "2011-12-30"
+  s.description = "Now you can use the super fast COPY for import/export data directly from your AR models."
+  s.email = "diogob@gmail.com"
   s.extra_rdoc_files = [
     "LICENSE",
     "README.md"
   ]
   s.files = [
     ".document",
+    ".rspec",
     "Gemfile",
     "Gemfile.lock",
     "LICENSE",
@@ -29,6 +30,7 @@ Gem::Specification.new do |s|
     "lib/postgres-copy/csv_responder.rb",
     "lib/postgres-copy/zip_responder.rb",
     "postgres-copy.gemspec",
+    "spec/fixtures/comma_with_header.csv",
     "spec/fixtures/extra_field.rb",
     "spec/fixtures/reserved_word_model.rb",
     "spec/fixtures/reserved_words.csv",
@@ -46,10 +48,10 @@ Gem::Specification.new do |s|
     "spec/spec.opts",
     "spec/spec_helper.rb"
   ]
-  s.homepage = %q{http://github.com/diogob/postgres-copy}
+  s.homepage = "http://github.com/diogob/postgres-copy"
   s.require_paths = ["lib"]
-  s.rubygems_version = %q{1.6.2}
-  s.summary = %q{Put COPY command functionality in ActiveRecord's model class}
+  s.rubygems_version = "1.8.10"
+  s.summary = "Put COPY command functionality in ActiveRecord's model class"
 
   if s.respond_to? :specification_version then
     s.specification_version = 3
@@ -59,8 +61,8 @@ Gem::Specification.new do |s|
       s.add_runtime_dependency(%q<activerecord>, [">= 0"])
       s.add_runtime_dependency(%q<rails>, [">= 0"])
       s.add_runtime_dependency(%q<rake>, ["= 0.8.7"])
-      s.add_runtime_dependency(%q<rspec>, ["~> 2.5"])
-      s.add_runtime_dependency(%q<rspec-core>, ["~> 2.5"])
+      s.add_runtime_dependency(%q<rspec>, ["~> 2.6"])
+      s.add_runtime_dependency(%q<rspec-core>, ["~> 2.6"])
       s.add_development_dependency(%q<rspec>, [">= 1.2.9"])
       s.add_runtime_dependency(%q<activerecord>, [">= 3.0.0"])
     else
@@ -68,8 +70,8 @@ Gem::Specification.new do |s|
       s.add_dependency(%q<activerecord>, [">= 0"])
       s.add_dependency(%q<rails>, [">= 0"])
       s.add_dependency(%q<rake>, ["= 0.8.7"])
-      s.add_dependency(%q<rspec>, ["~> 2.5"])
-      s.add_dependency(%q<rspec-core>, ["~> 2.5"])
+      s.add_dependency(%q<rspec>, ["~> 2.6"])
+      s.add_dependency(%q<rspec-core>, ["~> 2.6"])
       s.add_dependency(%q<rspec>, [">= 1.2.9"])
       s.add_dependency(%q<activerecord>, [">= 3.0.0"])
     end
@@ -78,8 +80,8 @@ Gem::Specification.new do |s|
     s.add_dependency(%q<activerecord>, [">= 0"])
     s.add_dependency(%q<rails>, [">= 0"])
     s.add_dependency(%q<rake>, ["= 0.8.7"])
-    s.add_dependency(%q<rspec>, ["~> 2.5"])
-    s.add_dependency(%q<rspec-core>, ["~> 2.5"])
+    s.add_dependency(%q<rspec>, ["~> 2.6"])
+    s.add_dependency(%q<rspec-core>, ["~> 2.6"])
     s.add_dependency(%q<rspec>, [">= 1.2.9"])
     s.add_dependency(%q<activerecord>, [">= 3.0.0"])
   end
