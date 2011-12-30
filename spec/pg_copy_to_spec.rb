@@ -9,27 +9,41 @@ describe "COPY TO" do
     TestModel.create :data => 'test data 1'
   end
 
-  it "should copy and pass data to block if block is given and no path is passed" do
-    File.open('spec/fixtures/tab_with_header.csv', 'r') do |f|
-      TestModel.pg_copy_to do |row|
-        row.should == f.readline
-      end
+  describe ".pg_copy_to_string" do
+    context "with no options" do
+      subject{ TestModel.pg_copy_to_string }
+      it{ should == File.open('spec/fixtures/comma_with_header.csv', 'r').read }
+    end
+
+    context "with tab as delimiter" do
+      subject{ TestModel.pg_copy_to_string :delimiter => "\t" }
+      it{ should == File.open('spec/fixtures/tab_with_header.csv', 'r').read }
     end
   end
 
-  it "should copy to disk if block is not given and a path is passed" do
-    TestModel.pg_copy_to '/tmp/export.csv'
-    File.open('spec/fixtures/tab_with_header.csv', 'r') do |fixture|
-      File.open('/tmp/export.csv', 'r') do |result|
-        result.read.should == fixture.read
+  describe ".pg_copy_to" do
+    it "should copy and pass data to block if block is given and no path is passed" do
+      File.open('spec/fixtures/comma_with_header.csv', 'r') do |f|
+        TestModel.pg_copy_to do |row|
+          row.should == f.readline
+        end
       end
     end
-  end
 
-  it "should raise exception if I pass a path and a block simultaneously" do
-    lambda do
-      TestModel.pg_copy_to('/tmp/bogus_path') do |row|
+    it "should copy to disk if block is not given and a path is passed" do
+      TestModel.pg_copy_to '/tmp/export.csv'
+      File.open('spec/fixtures/comma_with_header.csv', 'r') do |fixture|
+        File.open('/tmp/export.csv', 'r') do |result|
+          result.read.should == fixture.read
+        end
       end
-    end.should raise_error
+    end
+
+    it "should raise exception if I pass a path and a block simultaneously" do
+      lambda do
+        TestModel.pg_copy_to('/tmp/bogus_path') do |row|
+        end
+      end.should raise_error
+    end
   end
 end
