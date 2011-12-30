@@ -14,9 +14,6 @@ module ActiveRecord
       return self
     end
     
-    def self.pg_copy_to_hash
-    end
-
     def self.pg_copy_to_string options = {}
       # It would be cool to work like an Enumerable
       data = ''
