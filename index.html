@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset='utf-8' />
+    <meta http-equiv="X-UA-Compatible" content="chrome=1" />
+    <meta name="description" content="Postgres Copy : Simple PostgreSQL's COPY command support in ActiveRecord models" />
+
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+
+    <title>Postgres Copy</title>
+  </head>
+
+  <body>
+
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <a id="forkme_banner" href="https://github.com/diogob/postgres-copy">View on GitHub</a>
+
+          <h1 id="project_title">Postgres Copy</h1>
+          <h2 id="project_tagline">Simple PostgreSQL's COPY command support in ActiveRecord models</h2>
+
+            <section id="downloads">
+              <a class="zip_download_link" href="https://github.com/diogob/postgres-copy/zipball/master">Download this project as a .zip file</a>
+              <a class="tar_download_link" href="https://github.com/diogob/postgres-copy/tarball/master">Download this project as a tar.gz file</a>
+            </section>
+        </header>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+        <p>This Gem will enable your AR models to use the PostgreSQL COPY command to import/export data in CSV format.
+If you need to tranfer data between a PostgreSQL database and CSV files, the PostgreSQL native CSV parser
+will give you a greater performance than using the ruby CSV+INSERT commands.
+I have not found time to make accurate benchmarks, but in the use scenario where I have developed the gem
+I have had a four-fold performance gain.
+This gem was written having the Rails framework in mind, I think it could work only with active-record, 
+but I will assume in this README that you are using Rails.</p>
+
+<h2>Install</h2>
+
+<p>Put it in your Gemfile</p>
+
+<pre><code>gem 'postgres-copy'
+</code></pre>
+
+<p>Run the bundle command</p>
+
+<pre><code>bundle
+</code></pre>
+
+<h2>Usage</h2>
+
+<p>The gem will add two aditiontal class methods to ActiveRecord::Base:</p>
+
+<ul>
+<li>pg_copy_to </li>
+<li>pg_copy_to_string</li>
+<li>pg_copy_from</li>
+</ul><h3>Using pg_copy_to and pg_copy_to_string</h3>
+
+<p>You can go to the rails console and try some cool things first.
+The first and most basic use case, let's copy the enteire content of a database table to a CSV file on the database server disk.
+Assuming we have a users table and a User AR model:</p>
+
+<pre><code>User.pg_copy_to '/tmp/users.csv'
+</code></pre>
+
+<p>This will execute in the database the command:</p>
+
+<pre><code>COPY (SELECT "users".* FROM "users" ) TO '/tmp/users.csv' WITH DELIMITER ',' CSV HEADER
+</code></pre>
+
+<p>Remark that the file will be created in the database server disk.<br>
+But what if you want to write the lines in a file on the server that is running Rails, instead of the database?<br>
+In this case you can pass a block and retrieve the generated lines and then write them to a file:</p>
+
+<pre><code>File.open('/tmp/users.csv', 'w') do |f|
+  User.pg_copy_to do |line|
+    f.write line
+  end
+end
+</code></pre>
+
+<p>Or, if you have enough memory, you can read all table contents to a string using .pg_copy_to_string</p>
+
+<pre><code>puts User.pg_copy_to_string
+</code></pre>
+
+<p>Another insteresting feature of pg_copy_to is that it uses the scoped relation, it means that you can use ARel 
+operations to generate different CSV files according to your needs.
+Assuming we want to generate a file only with the names of users 1, 2 and 3:</p>
+
+<pre><code>User.select("name").where(:id =&gt; [1,2,3]).pg_copy_to "/tmp/users.csv"
+</code></pre>
+
+<p>Which will generate the following SQL command:</p>
+
+<pre><code>COPY (SELECT name FROM "users" WHERE "users"."id" IN (1, 2, 3)) TO '/tmp/users.csv' WITH DELIMITER ',' CSV HEADER
+</code></pre>
+
+<h3>Using pg_copy_from</h3>
+
+<p>Now, if you want to copy data from a CSV file into the database, you can use the pg_copy_from method.
+It will allow you to copy data from an arbritary IO object or from a file in the database server (when you pass the path as string).<br>
+Let's first copy from a file in the database server, assuming again that we have a users table and 
+that we are in the Rails console:</p>
+
+<pre><code>User.pg_copy_from "/tmp/users.csv"
+</code></pre>
+
+<p>This command will use the headers in the CSV file as fields of the target table, so beware to always have a header in the files you want to import.
+If the column names in the CSV header do not match the field names of the target table, you can pass a map in the options parameter.</p>
+
+<pre><code>User.pg_copy_from "/tmp/users.csv", :map =&gt; {'name' =&gt; 'first_name'}
+</code></pre>
+
+<p>In the above example the header name in the CSV file will be mapped to the field called first_name in the users table.
+You can also manipulate and modify the values of the file being imported before they enter into the database using a block:</p>
+
+<pre><code>User.pg_copy_from "/tmp/users.csv" do |row|
+  row[0] = "fixed string"
+end
+</code></pre>
+
+<p>The above extample will always change the value of the first column to "fixed string" before storing it into the database.
+For each iteration of the block row receives an array with the same order as the columns in the CSV file.</p>
+
+<h2>Note on Patches/Pull Requests</h2>
+
+<ul>
+<li>Fork the project.</li>
+<li>Make your feature addition or bug fix.</li>
+<li>Add tests for it. This is important so I don't break it in a
+future version unintentionally.</li>
+<li>Commit, do not mess with rakefile, version, or history.
+(if you want to have your own version, that is fine but bump version in a commit by itself I can ignore when I pull)</li>
+<li>Send me a pull request. Bonus points for topic branches.</li>
+</ul><h2>Copyright</h2>
+
+<p>Copyright (c) 2011 Diogo Biazus. See LICENSE for details.</p>
+      </section>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p class="copyright">Postgres Copy maintained by <a href="https://github.com/diogob">diogob</a></p>
+        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
+      </footer>
+    </div>
+
+    
+
+  </body>
+</html>
