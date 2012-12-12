@@ -25,6 +25,9 @@ module ActiveRecord
     def self.pg_copy_to_string options = {}
       data = ''
       self.pg_copy_to(nil, options){|l| data += l }
+      if options[:format] == :binary
+        data.force_encoding("ASCII-8BIT")
+      end
       data
     end
 

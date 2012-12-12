@@ -11,11 +11,11 @@ describe "COPY TO" do
 
   describe "should allow binary output to string" do
     context "with only binary option" do
-      subject{ TestModel.pg_copy_to_string(:format => :binary).force_encoding("ASCII-8BIT") }
+      subject{ TestModel.pg_copy_to_string(:format => :binary) }
       it{ should == File.open('spec/fixtures/2_col_binary_data.dat', 'r:ASCII-8BIT').read }
     end
     context "with custom select" do
-      subject{ TestModel.select("id, data").pg_copy_to_string(:format => :binary).force_encoding("ASCII-8BIT") }
+      subject{ TestModel.select("id, data").pg_copy_to_string(:format => :binary) }
       it{ should == File.open('spec/fixtures/2_col_binary_data.dat', 'r:ASCII-8BIT').read }
     end
   end
