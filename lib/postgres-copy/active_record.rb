@@ -50,7 +50,6 @@ module ActiveRecord
 
       columns_list = columns_list.map{|c| options[:map][c.to_s] } if options[:map]
       columns_string = columns_list.size > 0 ? "(\"#{columns_list.join('","')}\")" : ""
-      puts %{COPY #{quoted_table_name} ("#{columns_list.join('","')}") FROM STDIN WITH #{options_string}}
       connection.execute %{COPY #{quoted_table_name} #{columns_string} FROM STDIN WITH #{options_string}}
       if options[:format] == :binary
         bytes = 0
