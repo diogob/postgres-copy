@@ -14,13 +14,16 @@ RSpec.configure do |config|
       ActiveRecord::Base.establish_connection(
         :adapter  => "postgresql",
         :host     => "localhost",
+        :username => "postgres",
+        :password => "postgres",
+        :port     => 5433,
         :database => "ar_pg_copy_test"
       )
       ActiveRecord::Base.connection.execute %{
         SET client_min_messages TO warning;
-        DROP TABLE IF EXISTS test_models; 
-        DROP TABLE IF EXISTS extra_fields; 
-        DROP TABLE IF EXISTS reserved_word_models; 
+        DROP TABLE IF EXISTS test_models;
+        DROP TABLE IF EXISTS extra_fields;
+        DROP TABLE IF EXISTS reserved_word_models;
         CREATE TABLE test_models (id serial PRIMARY KEY, data text);
         CREATE TABLE reserved_word_models (id serial PRIMARY KEY, "select" text, "group" text);
         CREATE TABLE extra_fields (id serial PRIMARY KEY, data text, created_at timestamp, updated_at timestamp);
@@ -30,6 +33,9 @@ RSpec.configure do |config|
       ActiveRecord::Base.establish_connection(
         :adapter  => "postgresql",
         :host     => "localhost",
+        :username => "postgres",
+        :password => "postgres",
+        :port     => 5433,
         :database => "postgres"
       )
       ActiveRecord::Base.connection.execute "CREATE DATABASE ar_pg_copy_test"
