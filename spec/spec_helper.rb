@@ -16,7 +16,7 @@ RSpec.configure do |config|
         :host     => "localhost",
         :username => "postgres",
         :password => "postgres",
-        :port     => 5433,
+        :port     => 5432,
         :database => "ar_pg_copy_test"
       )
       ActiveRecord::Base.connection.execute %{
@@ -35,7 +35,7 @@ RSpec.configure do |config|
         :host     => "localhost",
         :username => "postgres",
         :password => "postgres",
-        :port     => 5433,
+        :port     => 5432,
         :database => "postgres"
       )
       ActiveRecord::Base.connection.execute "CREATE DATABASE ar_pg_copy_test"
