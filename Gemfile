@@ -1,5 +1,6 @@
 source :gemcutter
 
+gem 'jeweler'
 gem 'pg'
 gem 'activerecord'
 gem 'rails'
