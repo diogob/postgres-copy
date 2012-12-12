@@ -62,11 +62,25 @@ Which will generate the following SQL command:
 
     COPY (SELECT name FROM "users" WHERE "users"."id" IN (1, 2, 3)) TO '/tmp/users.csv' WITH DELIMITER ',' CSV HEADER
 
+The COPY command also supports exporting the data in binary format.
+
+    User.select("name").where(:id => [1,2,3]).pg_copy_to "/tmp/users.dat", :format => :binary
+
+Which will generate the following SQL command:
+
+    COPY (SELECT name FROM "users" WHERE "users"."id" IN (1, 2, 3)) TO '/tmp/users.dat' WITH BINARY
+
+The copy_to_string method also supports this
+
+    puts User.pg_copy_to_string(:format => :binary)
+
+
+
 ### Using pg_copy_from
 
 Now, if you want to copy data from a CSV file into the database, you can use the pg_copy_from method.
-It will allow you to copy data from an arbritary IO object or from a file in the database server (when you pass the path as string).   
-Let's first copy from a file in the database server, assuming again that we have a users table and 
+It will allow you to copy data from an arbritary IO object or from a file in the database server (when you pass the path as string).
+Let's first copy from a file in the database server, assuming again that we have a users table and
 that we are in the Rails console:
 
     User.pg_copy_from "/tmp/users.csv"
@@ -86,8 +100,24 @@ You can also manipulate and modify the values of the file being imported before 
 The above extample will always change the value of the first column to "fixed string" before storing it into the database.
 For each iteration of the block row receives an array with the same order as the columns in the CSV file.
 
+
+To copy a binary formatted data file or IO object you can specify the format as binary
+
+    User.pg_copy_from "/tmp/users.dat", :format => :binary
+
+NOTE: Columns must line up with the table unless you specify how they map to table columns.
+
+To specify how the columns will map to the table you can specify the :columns option
+
+    User.pg_copy_from "/tmp/users.dat", :format => :binary, :columns => [:id, :name]
+
+Which will generate the following SQL command:
+
+    COPY users (id, name) FROM '/tmp/users.dat' WITH BINARY
+
+
 ## Note on Patches/Pull Requests
- 
+
 * Fork the project.
 * Make your feature addition or bug fix.
 * Add tests for it. This is important so I don't break it in a
