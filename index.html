@@ -31,7 +31,9 @@
     <!-- MAIN CONTENT -->
     <div id="main_content_wrap" class="outer">
       <section id="main_content" class="inner">
-        <p>This Gem will enable your AR models to use the PostgreSQL COPY command to import/export data in CSV format.
+        <h1>postgres-copy</h1>
+
+<p>This Gem will enable your AR models to use the PostgreSQL COPY command to import/export data in CSV format.
 If you need to tranfer data between a PostgreSQL database and CSV files, the PostgreSQL native CSV parser
 will give you a greater performance than using the ruby CSV+INSERT commands.
 I have not found time to make accurate benchmarks, but in the use scenario where I have developed the gem
@@ -101,11 +103,26 @@ Assuming we want to generate a file only with the names of users 1, 2 and 3:</p>
 <pre><code>COPY (SELECT name FROM "users" WHERE "users"."id" IN (1, 2, 3)) TO '/tmp/users.csv' WITH DELIMITER ',' CSV HEADER
 </code></pre>
 
+<p>The COPY command also supports exporting the data in binary format.</p>
+
+<pre><code>User.select("name").where(:id =&gt; [1,2,3]).pg_copy_to "/tmp/users.dat", :format =&gt; :binary
+</code></pre>
+
+<p>Which will generate the following SQL command:</p>
+
+<pre><code>COPY (SELECT name FROM "users" WHERE "users"."id" IN (1, 2, 3)) TO '/tmp/users.dat' WITH BINARY
+</code></pre>
+
+<p>The copy_to_string method also supports this</p>
+
+<pre><code>puts User.pg_copy_to_string(:format =&gt; :binary)
+</code></pre>
+
 <h3>Using pg_copy_from</h3>
 
 <p>Now, if you want to copy data from a CSV file into the database, you can use the pg_copy_from method.
-It will allow you to copy data from an arbritary IO object or from a file in the database server (when you pass the path as string).<br>
-Let's first copy from a file in the database server, assuming again that we have a users table and 
+It will allow you to copy data from an arbritary IO object or from a file in the database server (when you pass the path as string).
+Let's first copy from a file in the database server, assuming again that we have a users table and
 that we are in the Rails console:</p>
 
 <pre><code>User.pg_copy_from "/tmp/users.csv"
@@ -127,6 +144,23 @@ end
 
 <p>The above extample will always change the value of the first column to "fixed string" before storing it into the database.
 For each iteration of the block row receives an array with the same order as the columns in the CSV file.</p>
+
+<p>To copy a binary formatted data file or IO object you can specify the format as binary</p>
+
+<pre><code>User.pg_copy_from "/tmp/users.dat", :format =&gt; :binary
+</code></pre>
+
+<p>NOTE: Columns must line up with the table unless you specify how they map to table columns.</p>
+
+<p>To specify how the columns will map to the table you can specify the :columns option</p>
+
+<pre><code>User.pg_copy_from "/tmp/users.dat", :format =&gt; :binary, :columns =&gt; [:id, :name]
+</code></pre>
+
+<p>Which will generate the following SQL command:</p>
+
+<pre><code>COPY users (id, name) FROM '/tmp/users.dat' WITH BINARY
+</code></pre>
 
 <h2>Note on Patches/Pull Requests</h2>
 
