@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = "postgres-copy"
-  s.version = "0.5.0"
+  s.version = "0.5.2"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Diogo Biazus"]
-  s.date = "2012-12-12"
+  s.date = "2012-12-18"
   s.description = "Now you can use the super fast COPY for import/export data directly from your AR models."
   s.email = "diogob@gmail.com"
   s.extra_rdoc_files = [
@@ -67,6 +67,7 @@ Gem::Specification.new do |s|
       s.add_runtime_dependency(%q<rake>, [">= 0"])
       s.add_runtime_dependency(%q<rspec>, ["~> 2.6"])
       s.add_runtime_dependency(%q<rspec-core>, ["~> 2.6"])
+      s.add_development_dependency(%q<jeweler>, [">= 0"])
       s.add_development_dependency(%q<rspec>, [">= 1.2.9"])
       s.add_runtime_dependency(%q<activerecord>, [">= 3.0.0"])
     else
@@ -77,6 +78,7 @@ Gem::Specification.new do |s|
       s.add_dependency(%q<rake>, [">= 0"])
       s.add_dependency(%q<rspec>, ["~> 2.6"])
       s.add_dependency(%q<rspec-core>, ["~> 2.6"])
+      s.add_dependency(%q<jeweler>, [">= 0"])
       s.add_dependency(%q<rspec>, [">= 1.2.9"])
       s.add_dependency(%q<activerecord>, [">= 3.0.0"])
     end
@@ -88,6 +90,7 @@ Gem::Specification.new do |s|
     s.add_dependency(%q<rake>, [">= 0"])
     s.add_dependency(%q<rspec>, ["~> 2.6"])
     s.add_dependency(%q<rspec-core>, ["~> 2.6"])
+    s.add_dependency(%q<jeweler>, [">= 0"])
     s.add_dependency(%q<rspec>, [">= 1.2.9"])
     s.add_dependency(%q<activerecord>, [">= 3.0.0"])
   end
