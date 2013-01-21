@@ -9,7 +9,7 @@ Gem::Specification.new do |s|
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Diogo Biazus"]
-  s.date = "2012-12-21"
+  s.date = "2013-01-21"
   s.description = "Now you can use the super fast COPY for import/export data directly from your AR models."
   s.email = "diogob@gmail.com"
   s.extra_rdoc_files = [
@@ -28,7 +28,6 @@ Gem::Specification.new do |s|
     "lib/postgres-copy.rb",
     "lib/postgres-copy/active_record.rb",
     "lib/postgres-copy/csv_responder.rb",
-    "lib/postgres-copy/zip_responder.rb",
     "postgres-copy.gemspec",
     "spec/fixtures/2_col_binary_data.dat",
     "spec/fixtures/comma_with_header.csv",

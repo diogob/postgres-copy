@@ -1,7 +1,9 @@
-class ActionController::Responder
+module Responders::CsvResponder
   def to_csv
-    name = "#{controller.resource.class.name.downcase}_#{Time.now.to_i}"
-    
-    return controller.send_data controller.send(:end_of_association_chain).pg_copy_to_string, :filename => "/tmp/#{name}.csv", :type => "text/csv", :disposition => 'inline'
+    controller.response_body = Enumerator.new do |y|
+      controller.send(:end_of_association_chain).pg_copy_to do |line|
+        y << line
+      end
+    end
   end
 end

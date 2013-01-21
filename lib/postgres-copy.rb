@@ -11,7 +11,6 @@ class PostgresCopy < Rails::Railtie
     end
     ActiveSupport.on_load :action_controller do
       require "postgres-copy/csv_responder"
-      require "postgres-copy/zip_responder"
     end
   end
 end
