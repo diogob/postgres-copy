@@ -6,6 +6,7 @@ gem 'rails'
 gem 'rake'
 gem 'rspec', '~> 2.6'
 gem 'rspec-core', '~> 2.6'
+gem 'responders'
 
 
 group :test, :development do
