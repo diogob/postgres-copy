@@ -1,36 +1,44 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
-
   <head>
-    <meta charset='utf-8' />
-    <meta http-equiv="X-UA-Compatible" content="chrome=1" />
-    <meta name="description" content="Postgres Copy : Simple PostgreSQL's COPY command support in ActiveRecord models" />
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Postgres Copy by diogob</title>
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script src="javascripts/main.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
 
-    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
-
-    <title>Postgres Copy</title>
   </head>
-
   <body>
 
-    <!-- HEADER -->
-    <div id="header_wrap" class="outer">
-        <header class="inner">
-          <a id="forkme_banner" href="https://github.com/diogob/postgres-copy">View on GitHub</a>
+      <header>
+        <h1>Postgres Copy</h1>
+        <p>Simple PostgreSQL's COPY command support in ActiveRecord models</p>
+      </header>
 
-          <h1 id="project_title">Postgres Copy</h1>
-          <h2 id="project_tagline">Simple PostgreSQL's COPY command support in ActiveRecord models</h2>
+      <div id="banner">
+        <span id="logo"></span>
 
-            <section id="downloads">
-              <a class="zip_download_link" href="https://github.com/diogob/postgres-copy/zipball/master">Download this project as a .zip file</a>
-              <a class="tar_download_link" href="https://github.com/diogob/postgres-copy/tarball/master">Download this project as a tar.gz file</a>
-            </section>
-        </header>
-    </div>
+        <a href="https://github.com/diogob/postgres-copy" class="button fork"><strong>View On GitHub</strong></a>
+        <div class="downloads">
+          <span>Downloads:</span>
+          <ul>
+            <li><a href="https://github.com/diogob/postgres-copy/zipball/master" class="button">ZIP</a></li>
+            <li><a href="https://github.com/diogob/postgres-copy/tarball/master" class="button">TAR</a></li>
+          </ul>
+        </div>
+      </div><!-- end banner -->
 
-    <!-- MAIN CONTENT -->
-    <div id="main_content_wrap" class="outer">
-      <section id="main_content" class="inner">
+    <div class="wrapper">
+      <nav>
+        <ul></ul>
+      </nav>
+      <section>
         <h1>postgres-copy</h1>
 
 <p>This Gem will enable your AR models to use the PostgreSQL COPY command to import/export data in CSV format.
@@ -162,6 +170,39 @@ For each iteration of the block row receives an array with the same order as the
 <pre><code>COPY users (id, name) FROM '/tmp/users.dat' WITH BINARY
 </code></pre>
 
+<h3>Using the CSV Responder</h3>
+
+<p>If you want to make the result of a COPY command available to download this gem provides a CSV responder that, in conjunction with <a href="https://github.com/josevalim/inherited_resources">inherited_resources</a>, is a very powerfull tool. BTW, do not try to use the responder without inherited_resources.</p>
+
+<p>The advantage of using this CSV responder over generating the CSV file, is that it will iterate over the resulting lines and send them to the client as they became available, so you will not have any problem with memory consumption or timeouts executing the action.</p>
+
+<p>Here's an example of controller using inherited resources and the CSV Responder:</p>
+
+<div class="highlight"><pre><span class="k">class</span> <span class="nc">Clients</span> <span class="o">&lt;</span> <span class="no">ApplicationController</span>
+  <span class="n">inherit_resources</span>
+  <span class="n">responders</span> <span class="ss">:csv</span>
+  <span class="n">respond_to</span> <span class="ss">:csv</span>
+  <span class="n">actions</span> <span class="ss">:index</span>
+<span class="k">end</span>
+</pre></div>
+
+<p>The example above should be enough to generate a CSV file with clients (given that database and routes are set up accordingly) if you access the index action passing csv as the format.
+The <a href="https://github.com/plataformatec/has_scope">has_scope</a> gem (included by default in inherited_resources) is very useful to filter the generated CSV file using model scopes.</p>
+
+<p>You could use something such as:</p>
+
+<div class="highlight"><pre><span class="k">class</span> <span class="nc">Clients</span> <span class="o">&lt;</span> <span class="no">ApplicationController</span>
+  <span class="n">inherit_resources</span>
+  <span class="n">responders</span> <span class="ss">:csv</span>
+  <span class="n">respond_to</span> <span class="ss">:csv</span>
+  <span class="n">actions</span> <span class="ss">:index</span>
+  <span class="n">has_scope</span> <span class="ss">:by_name</span>
+<span class="k">end</span>
+</pre></div>
+
+<p>To filter clients by name using a corresponding model scope.
+One could argue that this responder should be in a separate gem. But it's a very small piece of code and make the CSV available for download is a very common use case of postgres-copy.</p>
+
 <h2>Note on Patches/Pull Requests</h2>
 
 <ul>
@@ -176,17 +217,12 @@ future version unintentionally.</li>
 
 <p>Copyright (c) 2011 Diogo Biazus. See LICENSE for details.</p>
       </section>
-    </div>
-
-    <!-- FOOTER  -->
-    <div id="footer_wrap" class="outer">
-      <footer class="inner">
-        <p class="copyright">Postgres Copy maintained by <a href="https://github.com/diogob">diogob</a></p>
-        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
+      <footer>
+        <p>Project maintained by <a href="https://github.com/diogob">diogob</a></p>
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="http://twitter.com/#!/michigangraham">mattgraham</a></small></p>
       </footer>
     </div>
-
+    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
     
-
   </body>
 </html>
