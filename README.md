@@ -116,6 +116,39 @@ Which will generate the following SQL command:
     COPY users (id, name) FROM '/tmp/users.dat' WITH BINARY
 
 
+### Using the CSV Responder
+If you want to make the result of a COPY command available to download this gem provides a CSV responder that, in conjunction with [inherited_resources](https://github.com/josevalim/inherited_resources), is a very powerfull tool. BTW, do not try to use the responder without inherited_resources.
+
+The advantage of using this CSV responder over generating the CSV file, is that it will iterate over the resulting lines and send them to the client as they became available, so you will not have any problem with memory consumption or timeouts executing the action.
+
+Here's an example of controller using inherited resources and the CSV Responder:
+
+```ruby
+class Clients < ApplicationController
+  inherit_resources
+  responders :csv
+  respond_to :csv
+  actions :index
+end
+```
+
+The example above should be enough to generate a CSV file with clients (given that database and routes are set up accordingly) if you access the index action passing csv as the format.
+The [has_scope](https://github.com/plataformatec/has_scope) gem (included by default in inherited_resources) is very useful to filter the generated CSV file using model scopes.
+
+You could use something such as:
+```ruby
+class Clients < ApplicationController
+  inherit_resources
+  responders :csv
+  respond_to :csv
+  actions :index
+  has_scope :by_name
+end
+```
+
+To filter clients by name using a corresponding model scope.
+One could argue that this responder should be in a separate gem. But it's a very small piece of code and make the CSV available for download is a very common use case of postgres-copy.
+
 ## Note on Patches/Pull Requests
 
 * Fork the project.
