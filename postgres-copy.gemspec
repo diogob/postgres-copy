@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = "postgres-copy"
-  s.version = "0.5.5"
+  s.version = "0.5.6"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Diogo Biazus"]
-  s.date = "2013-01-29"
+  s.date = "2013-01-31"
   s.description = "Now you can use the super fast COPY for import/export data directly from your AR models."
   s.email = "diogob@gmail.com"
   s.extra_rdoc_files = [
