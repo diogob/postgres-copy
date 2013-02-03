@@ -1,14 +1,5 @@
 source :gemcutter
 
-gem 'pg'
-gem 'activerecord'
-gem 'rails'
-gem 'rake'
-gem 'rspec', '~> 2.6'
-gem 'rspec-core', '~> 2.6'
-gem 'responders'
-
-
-group :test, :development do
-  gem 'jeweler'
-end
+# specify gem dependencies in activerecord-postgres-hstore.gemspec
+# except the platform-specific dependencies below
+gemspec
