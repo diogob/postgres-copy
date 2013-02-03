@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    postgres-copy (0.5.6)
+    postgres-copy (0.5.7)
       activerecord (>= 3.0.0)
       pg
       rails (>= 3.0.0)
