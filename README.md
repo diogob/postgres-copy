@@ -56,13 +56,17 @@ end
 
 Or, if you have enough memory, you can read all table contents to a string using .pg_copy_to_string
 
-    puts User.pg_copy_to_string
+```ruby
+puts User.pg_copy_to_string
+```
 
 Another insteresting feature of pg_copy_to is that it uses the scoped relation, it means that you can use ARel 
 operations to generate different CSV files according to your needs.
 Assuming we want to generate a file only with the names of users 1, 2 and 3:
 
-    User.select("name").where(:id => [1,2,3]).pg_copy_to "/tmp/users.csv"
+```ruby
+User.select("name").where(:id => [1,2,3]).pg_copy_to "/tmp/users.csv"
+```
 
 Which will generate the following SQL command:
 
@@ -72,7 +76,9 @@ COPY (SELECT name FROM "users" WHERE "users"."id" IN (1, 2, 3)) TO '/tmp/users.c
 
 The COPY command also supports exporting the data in binary format.
 
-    User.select("name").where(:id => [1,2,3]).pg_copy_to "/tmp/users.dat", :format => :binary
+```ruby
+User.select("name").where(:id => [1,2,3]).pg_copy_to "/tmp/users.dat", :format => :binary
+```
 
 Which will generate the following SQL command:
 
