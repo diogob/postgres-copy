@@ -32,21 +32,27 @@ You can go to the rails console and try some cool things first.
 The first and most basic use case, let's copy the enteire content of a database table to a CSV file on the database server disk.
 Assuming we have a users table and a User AR model:
 
-    User.pg_copy_to '/tmp/users.csv'
+```ruby
+User.pg_copy_to '/tmp/users.csv'
+```
 
 This will execute in the database the command:
 
-    COPY (SELECT "users".* FROM "users" ) TO '/tmp/users.csv' WITH DELIMITER ',' CSV HEADER
+```sql
+COPY (SELECT "users".* FROM "users" ) TO '/tmp/users.csv' WITH DELIMITER ',' CSV HEADER
+```
 
 Remark that the file will be created in the database server disk.  
 But what if you want to write the lines in a file on the server that is running Rails, instead of the database?  
 In this case you can pass a block and retrieve the generated lines and then write them to a file:
 
-    File.open('/tmp/users.csv', 'w') do |f|
-      User.pg_copy_to do |line|
-        f.write line
-      end
-    end
+```ruby
+File.open('/tmp/users.csv', 'w') do |f|
+  User.pg_copy_to do |line|
+    f.write line
+  end
+end
+```
 
 Or, if you have enough memory, you can read all table contents to a string using .pg_copy_to_string
 
@@ -60,7 +66,9 @@ Assuming we want to generate a file only with the names of users 1, 2 and 3:
 
 Which will generate the following SQL command:
 
-    COPY (SELECT name FROM "users" WHERE "users"."id" IN (1, 2, 3)) TO '/tmp/users.csv' WITH DELIMITER ',' CSV HEADER
+```sql
+COPY (SELECT name FROM "users" WHERE "users"."id" IN (1, 2, 3)) TO '/tmp/users.csv' WITH DELIMITER ',' CSV HEADER
+```
 
 The COPY command also supports exporting the data in binary format.
 
@@ -68,11 +76,15 @@ The COPY command also supports exporting the data in binary format.
 
 Which will generate the following SQL command:
 
-    COPY (SELECT name FROM "users" WHERE "users"."id" IN (1, 2, 3)) TO '/tmp/users.dat' WITH BINARY
+```sql
+COPY (SELECT name FROM "users" WHERE "users"."id" IN (1, 2, 3)) TO '/tmp/users.dat' WITH BINARY
+```
 
 The copy_to_string method also supports this
 
-    puts User.pg_copy_to_string(:format => :binary)
+```ruby
+puts User.pg_copy_to_string(:format => :binary)
+```
 
 
 
@@ -83,19 +95,25 @@ It will allow you to copy data from an arbritary IO object or from a file in the
 Let's first copy from a file in the database server, assuming again that we have a users table and
 that we are in the Rails console:
 
-    User.pg_copy_from "/tmp/users.csv"
+```ruby
+User.pg_copy_from "/tmp/users.csv"
+```
 
 This command will use the headers in the CSV file as fields of the target table, so beware to always have a header in the files you want to import.
 If the column names in the CSV header do not match the field names of the target table, you can pass a map in the options parameter.
 
-    User.pg_copy_from "/tmp/users.csv", :map => {'name' => 'first_name'}
+```ruby
+User.pg_copy_from "/tmp/users.csv", :map => {'name' => 'first_name'}
+```
 
 In the above example the header name in the CSV file will be mapped to the field called first_name in the users table.
 You can also manipulate and modify the values of the file being imported before they enter into the database using a block:
 
-    User.pg_copy_from "/tmp/users.csv" do |row|
-      row[0] = "fixed string"
-    end
+```ruby
+User.pg_copy_from "/tmp/users.csv" do |row|
+  row[0] = "fixed string"
+end
+```
 
 The above extample will always change the value of the first column to "fixed string" before storing it into the database.
 For each iteration of the block row receives an array with the same order as the columns in the CSV file.
@@ -103,17 +121,23 @@ For each iteration of the block row receives an array with the same order as the
 
 To copy a binary formatted data file or IO object you can specify the format as binary
 
-    User.pg_copy_from "/tmp/users.dat", :format => :binary
+```ruby
+User.pg_copy_from "/tmp/users.dat", :format => :binary
+```
 
 NOTE: Columns must line up with the table unless you specify how they map to table columns.
 
 To specify how the columns will map to the table you can specify the :columns option
 
-    User.pg_copy_from "/tmp/users.dat", :format => :binary, :columns => [:id, :name]
+```ruby
+User.pg_copy_from "/tmp/users.dat", :format => :binary, :columns => [:id, :name]
+```
 
 Which will generate the following SQL command:
 
-    COPY users (id, name) FROM '/tmp/users.dat' WITH BINARY
+```sql
+COPY users (id, name) FROM '/tmp/users.dat' WITH BINARY
+```
 
 
 ### Using the CSV Responder
