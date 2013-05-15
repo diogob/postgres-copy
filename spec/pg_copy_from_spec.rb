@@ -5,7 +5,7 @@ describe "COPY FROM" do
     ActiveRecord::Base.connection.execute %{
       TRUNCATE TABLE test_models;
       SELECT setval('test_models_id_seq', 1, false);
-}
+    }
   end
 
   it "should import from file if path is passed without field_map" do
@@ -51,6 +51,16 @@ describe "COPY FROM" do
   it "default set of columns should be all table columns minus [id, created_at, updated_at]" do
     ExtraField.pg_copy_from(File.open(File.expand_path('spec/fixtures/comma_with_header.csv'), 'r'))
     ExtraField.order(:id).all.map{|r| r.attributes}.should == [{'id' => 1, 'data' => 'test data 1', 'created_at' => nil, 'updated_at' => nil}]
+  end
+
+  it "should not expect a header when :header is false" do
+    TestModel.pg_copy_from(File.open(File.expand_path('spec/fixtures/comma_without_header.csv'), 'r'), :header => false, :columns => [:id,:data])
+    TestModel.order(:id).all.map{|r| r.attributes}.should == [{'id' => 1, 'data' => 'test data 1'}]
+  end
+
+  it "should use the table name given by :table" do
+    ActiveRecord::Base.pg_copy_from(File.open(File.expand_path('spec/fixtures/comma_without_header.csv'), 'r'), :header => false, :columns => [:id,:data], :table => "test_models")
+    TestModel.order(:id).all.map{|r| r.attributes}.should == [{'id' => 1, 'data' => 'test data 1'}]
   end
 
   it "should be able to map the header in the file to diferent column names" do

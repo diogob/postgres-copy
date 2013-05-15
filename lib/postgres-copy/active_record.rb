@@ -36,24 +36,32 @@ module ActiveRecord
     # * You can map fields from the file to different fields in the table using a map in the options hash
     # * For further details on usage take a look at the README.md
     def self.pg_copy_from path_or_io, options = {}
-      options = {:delimiter => ",", :format => :csv}.merge(options)
+      options = {:delimiter => ",", :format => :csv, :header => true}.merge(options)
       options_string = if options[:format] == :binary
                         "BINARY"
                        else
                         "DELIMITER '#{options[:delimiter]}' CSV"
                        end
       io = path_or_io.instance_of?(String) ? File.open(path_or_io, 'r') : path_or_io
-      # The first line should be always the HEADER.
+
       if options[:format] == :binary
         columns_list = options[:columns] || []
-      else
+      elsif options[:header]
         line = io.gets
         columns_list = options[:columns] || line.strip.split(options[:delimiter])
+      else
+        columns_list = options[:columns]
+      end
+
+      table = if options[:table]
+        connection.quote_table_name(options[:table])
+      else
+        quoted_table_name
       end
 
       columns_list = columns_list.map{|c| options[:map][c.to_s] } if options[:map]
       columns_string = columns_list.size > 0 ? "(\"#{columns_list.join('","')}\")" : ""
-      connection.execute %{COPY #{quoted_table_name} #{columns_string} FROM STDIN WITH #{options_string}}
+      connection.execute %{COPY #{table} #{columns_string} FROM STDIN #{options_string}}
       if options[:format] == :binary
         bytes = 0
         begin
