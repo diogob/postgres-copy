@@ -11,9 +11,9 @@ module ActiveRecord
 
       if path
         raise "You have to choose between exporting to a file or receiving the lines inside a block" if block_given?
-        connection.execute "COPY (#{self.scoped.to_sql}) TO #{sanitize(path)} WITH #{options_string}"
+        connection.execute "COPY (#{self.all.to_sql}) TO #{sanitize(path)} WITH #{options_string}"
       else
-        connection.execute "COPY (#{self.scoped.to_sql}) TO STDOUT WITH #{options_string}"
+        connection.execute "COPY (#{self.all.to_sql}) TO STDOUT WITH #{options_string}"
         while line = connection.raw_connection.get_copy_data do
           yield(line) if block_given?
         end
