@@ -18,6 +18,10 @@ Run the bundle command
 
     bundle
 
+## Rails (or ActiveRecord) versions
+
+Rails 4 users should use the version 0.7 and onward, while if you use Rails 3.2 stick with the 0.6 versions.
+
 ## Usage
 
 The gem will add two aditiontal class methods to ActiveRecord::Base:
