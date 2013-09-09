@@ -24,11 +24,18 @@ Rails 4 users should use the version 0.7 and onward, while if you use Rails 3.2 
 
 ## Usage
 
-The gem will add two aditiontal class methods to ActiveRecord::Base:
+To enable the copy commands in an ActiveRecord model called User you should use:
+```ruby
+class User < ActiveRecord::Base
+  acts_as_copy_target
+end
+```
 
-* pg_copy_to 
-* pg_copy_to_string
-* pg_copy_from
+This will add the aditiontal class methods to your model:
+
+* copy_to 
+* copy_to_string
+* copy_from
 
 ### Using pg_copy_to and pg_copy_to_string
 
@@ -37,7 +44,7 @@ The first and most basic use case, let's copy the enteire content of a database 
 Assuming we have a users table and a User AR model:
 
 ```ruby
-User.pg_copy_to '/tmp/users.csv'
+User.copy_to '/tmp/users.csv'
 ```
 
 This will execute in the database the command:
@@ -52,16 +59,16 @@ In this case you can pass a block and retrieve the generated lines and then writ
 
 ```ruby
 File.open('/tmp/users.csv', 'w') do |f|
-  User.pg_copy_to do |line|
+  User.copy_to do |line|
     f.write line
   end
 end
 ```
 
-Or, if you have enough memory, you can read all table contents to a string using .pg_copy_to_string
+Or, if you have enough memory, you can read all table contents to a string using .copy_to_string
 
 ```ruby
-puts User.pg_copy_to_string
+puts User.copy_to_string
 ```
 
 Another insteresting feature of pg_copy_to is that it uses the scoped relation, it means that you can use ARel 
@@ -69,7 +76,7 @@ operations to generate different CSV files according to your needs.
 Assuming we want to generate a file only with the names of users 1, 2 and 3:
 
 ```ruby
-User.select("name").where(:id => [1,2,3]).pg_copy_to "/tmp/users.csv"
+User.select("name").where(:id => [1,2,3]).copy_to "/tmp/users.csv"
 ```
 
 Which will generate the following SQL command:
@@ -81,7 +88,7 @@ COPY (SELECT name FROM "users" WHERE "users"."id" IN (1, 2, 3)) TO '/tmp/users.c
 The COPY command also supports exporting the data in binary format.
 
 ```ruby
-User.select("name").where(:id => [1,2,3]).pg_copy_to "/tmp/users.dat", :format => :binary
+User.select("name").where(:id => [1,2,3]).copy_to "/tmp/users.dat", :format => :binary
 ```
 
 Which will generate the following SQL command:
@@ -93,7 +100,7 @@ COPY (SELECT name FROM "users" WHERE "users"."id" IN (1, 2, 3)) TO '/tmp/users.d
 The copy_to_string method also supports this
 
 ```ruby
-puts User.pg_copy_to_string(:format => :binary)
+puts User.copy_to_string(:format => :binary)
 ```
 
 
@@ -106,21 +113,21 @@ Let's first copy from a file in the database server, assuming again that we have
 that we are in the Rails console:
 
 ```ruby
-User.pg_copy_from "/tmp/users.csv"
+User.copy_from "/tmp/users.csv"
 ```
 
 This command will use the headers in the CSV file as fields of the target table, so beware to always have a header in the files you want to import.
 If the column names in the CSV header do not match the field names of the target table, you can pass a map in the options parameter.
 
 ```ruby
-User.pg_copy_from "/tmp/users.csv", :map => {'name' => 'first_name'}
+User.copy_from "/tmp/users.csv", :map => {'name' => 'first_name'}
 ```
 
 In the above example the header name in the CSV file will be mapped to the field called first_name in the users table.
 You can also manipulate and modify the values of the file being imported before they enter into the database using a block:
 
 ```ruby
-User.pg_copy_from "/tmp/users.csv" do |row|
+User.copy_from "/tmp/users.csv" do |row|
   row[0] = "fixed string"
 end
 ```
@@ -132,7 +139,7 @@ For each iteration of the block row receives an array with the same order as the
 To copy a binary formatted data file or IO object you can specify the format as binary
 
 ```ruby
-User.pg_copy_from "/tmp/users.dat", :format => :binary
+User.copy_from "/tmp/users.dat", :format => :binary
 ```
 
 NOTE: Columns must line up with the table unless you specify how they map to table columns.
@@ -140,7 +147,7 @@ NOTE: Columns must line up with the table unless you specify how they map to tab
 To specify how the columns will map to the table you can specify the :columns option
 
 ```ruby
-User.pg_copy_from "/tmp/users.dat", :format => :binary, :columns => [:id, :name]
+User.copy_from "/tmp/users.dat", :format => :binary, :columns => [:id, :name]
 ```
 
 Which will generate the following SQL command:
