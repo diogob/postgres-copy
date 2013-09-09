@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    postgres-copy (0.7.0)
+    postgres-copy (0.8.0)
       activerecord (~> 4.0)
       pg
       rails (~> 4.0)
@@ -45,7 +45,7 @@ GEM
     mail (2.5.4)
       mime-types (~> 1.16)
       treetop (~> 1.4.8)
-    mime-types (1.23)
+    mime-types (1.25)
     minitest (4.7.5)
     multi_json (1.7.9)
     pg (0.16.0)
@@ -91,7 +91,7 @@ GEM
     thread_safe (0.1.2)
       atomic
     tilt (1.4.1)
-    treetop (1.4.14)
+    treetop (1.4.15)
       polyglot
       polyglot (>= 0.3.1)
     tzinfo (0.3.37)

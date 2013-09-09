@@ -38,7 +38,7 @@ This will add the aditiontal class methods to your model:
 * copy_to_string
 * copy_from
 
-### Using pg_copy_to and pg_copy_to_string
+### Using copy_to and copy_to_string
 
 You can go to the rails console and try some cool things first.
 The first and most basic use case, let's copy the enteire content of a database table to a CSV file on the database server disk.
@@ -72,7 +72,7 @@ Or, if you have enough memory, you can read all table contents to a string using
 puts User.copy_to_string
 ```
 
-Another insteresting feature of pg_copy_to is that it uses the scoped relation, it means that you can use ARel 
+Another insteresting feature of copy_to is that it uses the scoped relation, it means that you can use ARel 
 operations to generate different CSV files according to your needs.
 Assuming we want to generate a file only with the names of users 1, 2 and 3:
 
@@ -106,9 +106,9 @@ puts User.copy_to_string(:format => :binary)
 
 
 
-### Using pg_copy_from
+### Using copy_from
 
-Now, if you want to copy data from a CSV file into the database, you can use the pg_copy_from method.
+Now, if you want to copy data from a CSV file into the database, you can use the copy_from method.
 It will allow you to copy data from an arbritary IO object or from a file in the database server (when you pass the path as string).
 Let's first copy from a file in the database server, assuming again that we have a users table and
 that we are in the Rails console:
