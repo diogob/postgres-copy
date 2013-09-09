@@ -9,12 +9,12 @@ describe "COPY FROM BINARY" do
   end
 
   it "should import from file if path is passed without field_map" do
-    TestModel.pg_copy_from File.expand_path('spec/fixtures/2_col_binary_data.dat'), :format => :binary, columns: [:id, :data]
+    TestModel.copy_from File.expand_path('spec/fixtures/2_col_binary_data.dat'), :format => :binary, columns: [:id, :data]
     TestModel.order(:id).map{|r| r.attributes}.should == [{'id' => 1, 'data' => 'text'}]
   end
 
   it "should import from file if columns are not specified" do
-    TestModel.pg_copy_from File.expand_path('spec/fixtures/2_col_binary_data.dat'), :format => :binary
+    TestModel.copy_from File.expand_path('spec/fixtures/2_col_binary_data.dat'), :format => :binary
     TestModel.order(:id).map{|r| r.attributes}.should == [{'id' => 1, 'data' => 'text'}]
   end
 

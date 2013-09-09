@@ -1,5 +1,6 @@
 require 'postgres-copy'
 
 class ReservedWordModel < ActiveRecord::Base
+  acts_as_copy_target
 end
 

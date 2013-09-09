@@ -1,16 +1,10 @@
 require 'rubygems'
-require 'active_record'
-require 'postgres-copy/active_record'
-require 'rails'
+require 'active_support'
 
-class PostgresCopy < Rails::Railtie
+ActiveSupport.on_load :active_record do
+  require "postgres-copy/acts_as_copy_target"
+end
 
-  initializer 'postgres-copy' do
-    ActiveSupport.on_load :active_record do
-      require "postgres-copy/active_record"
-    end
-    ActiveSupport.on_load :action_controller do
-      require "postgres-copy/csv_responder"
-    end
-  end
+ActiveSupport.on_load :action_controller do
+  require "postgres-copy/csv_responder"
 end
