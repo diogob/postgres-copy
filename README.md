@@ -18,9 +18,10 @@ Run the bundle command
 
     bundle
 
-## Rails (or ActiveRecord) versions
+## IMPORTANT note about recent versions
 
-Rails 4 users should use the version 0.7 and onward, while if you use Rails 3.2 stick with the 0.6 versions.
+* Rails 4 users should use the version 0.7 and onward, while if you use Rails 3.2 stick with the 0.6 versions.
+* Since version 0.8 all methods lost the prefix pg_ and they should be included in models thourgh acts_as_copy_target.
 
 ## Usage
 
