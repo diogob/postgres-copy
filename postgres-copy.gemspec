@@ -23,8 +23,8 @@ Gem::Specification.new do |s|
   s.summary = "Put COPY command functionality in ActiveRecord's model class"
 
   s.add_dependency "pg"
-  s.add_dependency "activerecord", '~> 4.0'
-  s.add_dependency "rails", '~> 4.0'
+  s.add_dependency "activerecord", '>= 4.0'
+  s.add_dependency "rails", '>= 4.0'
   s.add_dependency "responders"
   s.add_development_dependency "bundler"
   s.add_development_dependency "rdoc"
