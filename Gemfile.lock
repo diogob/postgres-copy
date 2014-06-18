@@ -3,7 +3,7 @@ PATH
   specs:
     postgres-copy (0.6.0)
       activerecord (>= 3.0.0)
-      pg
+      pg (~> 0.17.0)
       rails (>= 3.0.0)
       responders
 

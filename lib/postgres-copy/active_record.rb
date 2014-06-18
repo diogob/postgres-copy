@@ -36,53 +36,66 @@ module ActiveRecord
     # * You can map fields from the file to different fields in the table using a map in the options hash
     # * For further details on usage take a look at the README.md
     def self.pg_copy_from path_or_io, options = {}
-      options = {:delimiter => ",", :format => :csv, :header => true}.merge(options)
-      options_string = if options[:format] == :binary
-                        "BINARY"
-                       else
-                        "DELIMITER '#{options[:delimiter]}' CSV"
-                       end
+      options.reverse_merge!({:delimiter => ",", :format => :csv, :header => true})
+      options_string = options[:format] == :binary ? "BINARY" : "DELIMITER '#{options[:delimiter]}' CSV"
+
       io = path_or_io.instance_of?(String) ? File.open(path_or_io, 'r') : path_or_io
-
-      if options[:format] == :binary
-        columns_list = options[:columns] || []
-      elsif options[:header]
-        line = io.gets
-        columns_list = options[:columns] || line.strip.split(options[:delimiter])
-      else
-        columns_list = options[:columns]
-      end
-
-      table = if options[:table]
-        connection.quote_table_name(options[:table])
-      else
-        quoted_table_name
-      end
+      columns_list = get_columns_list(io, options)
+      table = get_table_name(options)
 
       columns_list = columns_list.map{|c| options[:map][c.to_s] } if options[:map]
       columns_string = columns_list.size > 0 ? "(\"#{columns_list.join('","')}\")" : ""
       connection.raw_connection.copy_data %{COPY #{table} #{columns_string} FROM STDIN #{options_string}} do
-        if options[:format] == :binary
-          bytes = 0
-          begin
-            while line = io.readpartial(10240)
-              connection.raw_connection.put_copy_data line
-              bytes += line.bytesize
-            end
-          rescue EOFError
-          end
-        else
-          while line = io.gets do
-            next if line.strip.size == 0
-            if block_given?
-              row = line.strip.split(options[:delimiter])
-              yield(row)
-              line = row.join(options[:delimiter]) + "\n"
-            end
-            connection.raw_connection.put_copy_data line
-          end
+
+        if block_given?
+          block = Proc.new
+        end
+        while line = read_input_line(io, options, &block) do
+          next if line.strip.size == 0
+          connection.raw_connection.put_copy_data line
         end
       end
     end
+
+    private 
+
+    def self.get_columns_list(io, options)
+      columns_list = options[:columns] || []
+
+      if options[:format] != :binary && options[:header]
+        #if header is present, we need to strip it from io, whether we use it for the columns list or not.
+        line = io.gets
+          if columns_list.empty?
+            columns_list = line.strip.split(options[:delimiter])
+          end
+      end
+      return columns_list
+    end
+
+    def self.get_table_name(options)
+      if options[:table]
+        connection.quote_table_name(options[:table])
+      else
+        quoted_table_name
+      end
+    end
+
+    def self.read_input_line(io, options)
+      if options[:format] == :binary
+        begin
+          return io.readpartial(10240)
+        rescue EOFError
+        end
+      else
+        line = io.gets
+        if block_given? && line
+          row = line.strip.split(options[:delimiter])
+          yield(row)
+          line = row.join(options[:delimiter]) + "\n"
+        end
+        return line
+      end
+    end
+
   end
 end
