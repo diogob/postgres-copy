@@ -1,4 +1,4 @@
-# postgres-copy [![Build Status](https://travis-ci.org/diogob/postgres-copy.png?branch=master)](https://travis-ci.org/diogob/postgres-copy)
+# postgres-copy [![Build Status](https://travis-ci.org/diogob/postgres-copy.png?branch=master)](https://travis-ci.org/diogob/postgres-copy) [![Code Climate](https://codeclimate.com/github/diogob/postgres-copy.png)](https://codeclimate.com/github/diogob/postgres-copy)
 
 This Gem will enable your AR models to use the PostgreSQL COPY command to import/export data in CSV format.
 If you need to tranfer data between a PostgreSQL database and CSV files, the PostgreSQL native CSV parser
