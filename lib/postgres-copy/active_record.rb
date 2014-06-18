@@ -61,28 +61,28 @@ module ActiveRecord
 
       columns_list = columns_list.map{|c| options[:map][c.to_s] } if options[:map]
       columns_string = columns_list.size > 0 ? "(\"#{columns_list.join('","')}\")" : ""
-      connection.execute %{COPY #{table} #{columns_string} FROM STDIN #{options_string}}
-      if options[:format] == :binary
-        bytes = 0
-        begin
-          while line = io.readpartial(10240)
+      connection.raw_connection.copy_data %{COPY #{table} #{columns_string} FROM STDIN #{options_string}} do
+        if options[:format] == :binary
+          bytes = 0
+          begin
+            while line = io.readpartial(10240)
+              connection.raw_connection.put_copy_data line
+              bytes += line.bytesize
+            end
+          rescue EOFError
+          end
+        else
+          while line = io.gets do
+            next if line.strip.size == 0
+            if block_given?
+              row = line.strip.split(options[:delimiter])
+              yield(row)
+              line = row.join(options[:delimiter]) + "\n"
+            end
             connection.raw_connection.put_copy_data line
-            bytes += line.bytesize
           end
-        rescue EOFError
-        end
-      else
-        while line = io.gets do
-          next if line.strip.size == 0
-          if block_given?
-            row = line.strip.split(options[:delimiter])
-            yield(row)
-            line = row.join(options[:delimiter]) + "\n"
-          end
-          connection.raw_connection.put_copy_data line
         end
       end
-      connection.raw_connection.put_copy_end
     end
   end
 end
