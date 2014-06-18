@@ -2,12 +2,8 @@ module ActiveRecord
   class Base
     # Copy data to a file passed as a string (the file path) or to lines that are passed to a block
     def self.pg_copy_to path = nil, options = {}
-      options = {:delimiter => ",", :format => :csv, :header => true}.merge(options)
-      options_string = if options[:format] == :binary
-                        "BINARY"
-                       else
-                        "DELIMITER '#{options[:delimiter]}' CSV #{options[:header] ? 'HEADER' : ''}"
-                       end
+      options.reverse_merge!({:delimiter => ",", :format => :csv, :header => true})
+      options_string = options[:format] == :binary ? "BINARY" : "DELIMITER '#{options[:delimiter]}' CSV #{options[:header] ? 'HEADER' : ''}"
 
       if path
         raise "You have to choose between exporting to a file or receiving the lines inside a block" if block_given?
@@ -41,17 +37,22 @@ module ActiveRecord
 
       io = path_or_io.instance_of?(String) ? File.open(path_or_io, 'r') : path_or_io
       columns_list = get_columns(io, options)
-      destination_table, copy_table = get_table_names(options)
+      
+      if options[:through_table]
+        if columns_list.empty? 
+          raise "The :through_table option requires either the :columns option or :header => true"
+        end
+        copy_table = options[:through_table]
+        destination_table = get_table_name(options)
+      else
+        copy_table = get_table_name(options)
+        destination_table = nil
+      end 
 
-      columns_list = columns_list.map{|c| options[:map][c.to_s] } if options[:map]
       columns_string = get_columns_string(columns_list)
+      create_temp_table(copy_table, destination_table) if destination_table
 
-      if copy_table != destination_table
-        raise "The :through_table option requires either the :columns option or :header => true" if columns_list.empty?
-        create_temp_table(copy_table, destination_table)
-      end
       connection.raw_connection.copy_data %{COPY #{copy_table} #{columns_string} FROM STDIN #{options_string}} do
-
         if block_given?
           block = Proc.new
         end
@@ -61,7 +62,7 @@ module ActiveRecord
         end
       end
 
-      if copy_table != destination_table
+      if destination_table
         upsert_from_temp_table(copy_table, destination_table, columns_list)
         drop_temp_table(copy_table)
       end
@@ -78,6 +79,8 @@ module ActiveRecord
             columns_list = line.strip.split(options[:delimiter])
           end
       end
+
+      columns_list = columns_list.map{|c| options[:map][c.to_s] } if options[:map]
       return columns_list
     end
 
@@ -89,14 +92,12 @@ module ActiveRecord
       columns_list.size > 0 ? "\"#{columns_list.join('","')}\"" : ""
     end
 
-    def self.get_table_names(options)
+    def self.get_table_name(options)
       if options[:table]
-        destination_table = connection.quote_table_name(options[:table])
+        connection.quote_table_name(options[:table])
       else
-        destination_table = quoted_table_name
+        quoted_table_name
       end
-      copy_table = options[:through_table] || destination_table
-      return destination_table, copy_table
     end
 
     def self.read_input_line(io, options)
