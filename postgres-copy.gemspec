@@ -5,7 +5,7 @@ $:.unshift lib unless $:.include?(lib)
 
 Gem::Specification.new do |s|
   s.name = "postgres-copy"
-  s.version = "0.8.1"
+  s.version = "0.9.0"
 
   s.platform    = Gem::Platform::RUBY
   s.required_ruby_version     = ">= 1.9.3"
