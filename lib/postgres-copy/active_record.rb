@@ -40,12 +40,17 @@ module ActiveRecord
       options_string = options[:format] == :binary ? "BINARY" : "DELIMITER '#{options[:delimiter]}' CSV"
 
       io = path_or_io.instance_of?(String) ? File.open(path_or_io, 'r') : path_or_io
-      columns_list = get_columns_list(io, options)
-      table = get_table_name(options)
+      columns_list = get_columns(io, options)
+      destination_table, copy_table = get_table_names(options)
 
       columns_list = columns_list.map{|c| options[:map][c.to_s] } if options[:map]
-      columns_string = columns_list.size > 0 ? "(\"#{columns_list.join('","')}\")" : ""
-      connection.raw_connection.copy_data %{COPY #{table} #{columns_string} FROM STDIN #{options_string}} do
+      columns_string = get_columns_string(columns_list)
+
+      if copy_table != destination_table
+        raise "The :through_table option requires either the :columns option or :header => true" if columns_list.empty?
+        create_temp_table(copy_table, destination_table)
+      end
+      connection.raw_connection.copy_data %{COPY #{copy_table} #{columns_string} FROM STDIN #{options_string}} do
 
         if block_given?
           block = Proc.new
@@ -55,11 +60,15 @@ module ActiveRecord
           connection.raw_connection.put_copy_data line
         end
       end
+
+      if copy_table != destination_table
+        upsert_from_temp_table(copy_table, destination_table, columns_list)
+        drop_temp_table(copy_table)
+      end
     end
 
-    private 
-
-    def self.get_columns_list(io, options)
+    private
+    def self.get_columns(io, options)
       columns_list = options[:columns] || []
 
       if options[:format] != :binary && options[:header]
@@ -72,12 +81,22 @@ module ActiveRecord
       return columns_list
     end
 
-    def self.get_table_name(options)
+    def self.get_columns_string(columns_list)
+      columns_list.size > 0 ? "(\"#{columns_list.join('","')}\")" : ""
+    end
+
+    def self.get_clean_columns_string(columns_list)
+      columns_list.size > 0 ? "\"#{columns_list.join('","')}\"" : ""
+    end
+
+    def self.get_table_names(options)
       if options[:table]
-        connection.quote_table_name(options[:table])
+        destination_table = connection.quote_table_name(options[:table])
       else
-        quoted_table_name
+        destination_table = quoted_table_name
       end
+      copy_table = options[:through_table] || destination_table
+      return destination_table, copy_table
     end
 
     def self.read_input_line(io, options)
@@ -97,5 +116,51 @@ module ActiveRecord
       end
     end
 
+    def self.upsert_from_temp_table(temp_table, dest_table, columns_list)
+      update_from_temp_table(temp_table, dest_table, columns_list)
+      insert_from_temp_table(temp_table, dest_table, columns_list)
+    end
+
+    def self.update_from_temp_table(temp_table, dest_table, columns_list)
+      ActiveRecord::Base.connection.execute <<-SQL
+        UPDATE #{dest_table} AS d
+          #{update_set_clause(columns_list)}
+          FROM #{temp_table} as t
+          WHERE t.#{primary_key} = d.#{primary_key}
+          AND d.#{primary_key} IS NOT NULL;
+      SQL
+    end
+
+    def self.update_set_clause(columns_list)
+      command = columns_list.map do |col|
+        "#{col} = t.#{col}"
+      end
+      "SET #{command.join(',')}"
+    end
+
+    def self.insert_from_temp_table(temp_table, dest_table, columns_list)
+      columns_string = get_columns_string(columns_list)
+      select_string = get_clean_columns_string(columns_list)
+      ActiveRecord::Base.connection.execute <<-SQL
+        INSERT INTO #{dest_table} #{columns_string}
+          SELECT #{select_string}
+          FROM #{temp_table} as t
+          WHERE t.#{primary_key} NOT IN (SELECT #{primary_key} FROM #{dest_table})
+          AND t.#{primary_key} IS NOT NULL;
+      SQL
+    end
+
+    def self.create_temp_table(temp_table, dest_table)
+      ActiveRecord::Base.connection.execute <<-SQL
+        CREATE TEMP TABLE #{temp_table} 
+          AS SELECT * FROM #{dest_table} WHERE 0 = 1;
+      SQL
+    end
+
+    def self.drop_temp_table(temp_table)
+      ActiveRecord::Base.connection.execute <<-SQL
+        DROP TABLE #{temp_table} 
+      SQL
+    end
   end
 end
