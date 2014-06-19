@@ -121,7 +121,7 @@ User.pg_copy_from "/tmp/users.csv" do |row|
 end
 ```
 
-The above extample will always change the value of the first column to "fixed string" before storing it into the database.
+The above example will always change the value of the first column to "fixed string" before storing it into the database.
 For each iteration of the block row receives an array with the same order as the columns in the CSV file.
 
 
@@ -145,6 +145,18 @@ Which will generate the following SQL command:
 COPY users (id, name) FROM '/tmp/users.dat' WITH BINARY
 ```
 
+pg_copy_from also supports 'upserting' data using the :through_table option.  Since the Postgres copy command does not handle updating existing records, the postgres-copy gem accomplishes update and insert using an intermediary temp table:
+
+```ruby
+User.copy_from "/tmp/users.csv", :through_table => "users_temp"
+```
+
+This command will process the data in 5 steps:
+* create a temp table called "users_temp".  In postgres this temp table is only visible to the current database session
+* COPY the data to user_temp
+* insert all records from users_temp into users, as long as the primary key is not already in users.
+* update all records in users with the data in users_temp, matching on primary key
+* drop the temp table.
 
 ### Using the CSV Responder
 If you want to make the result of a COPY command available to download this gem provides a CSV responder that, in conjunction with [inherited_resources](https://github.com/josevalim/inherited_resources), is a very powerfull tool. BTW, do not try to use the responder without inherited_resources.
