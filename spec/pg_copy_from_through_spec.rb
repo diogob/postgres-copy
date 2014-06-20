@@ -32,4 +32,12 @@ describe "COPY FROM with :through_table option" do
     ActiveRecord::Base.connection.tables.should_not include("test_models_temp")
   end
 
+  it "should gracefully drop the temp table if it already exists" do
+    ActiveRecord::Base.connection.execute "CREATE TEMP TABLE test_models_temp (LIKE test_models);"
+
+    TestModel.pg_copy_from File.expand_path('spec/fixtures/tab_with_two_lines.csv'), :delimiter => "\t", :through_table => "test_models_temp"
+    TestModel.order(:id).all.map{|r| r.attributes}.
+      should == [{"id"=>1, "data"=>"test data 1"}, {"id"=>2, "data"=>"test data 2"}]
+  end
+
 end

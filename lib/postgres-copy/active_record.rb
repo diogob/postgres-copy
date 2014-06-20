@@ -146,15 +146,20 @@ module ActiveRecord
         INSERT INTO #{dest_table} #{columns_string}
           SELECT #{select_string}
           FROM #{temp_table} as t
-          WHERE t.#{primary_key} NOT IN (SELECT #{primary_key} FROM #{dest_table})
+          WHERE NOT EXISTS 
+            (SELECT 1 
+                  FROM #{dest_table} as d 
+                  WHERE d.#{primary_key} = t.#{primary_key})
           AND t.#{primary_key} IS NOT NULL;
       SQL
     end
 
     def self.create_temp_table(temp_table, dest_table)
       ActiveRecord::Base.connection.execute <<-SQL
+        DROP TABLE IF EXISTS #{temp_table};
+        
         CREATE TEMP TABLE #{temp_table} 
-          AS SELECT * FROM #{dest_table} WHERE 0 = 1;
+          (LIKE #{dest_table} INCLUDING DEFAULTS EXCLUDING CONSTRAINTS EXCLUDING INDEXES);
       SQL
     end
 
