@@ -156,6 +156,7 @@ module ActiveRecord
 
     def self.create_temp_table(temp_table, dest_table)
       ActiveRecord::Base.connection.execute <<-SQL
+        SET client_min_messages=WARNING;
         DROP TABLE IF EXISTS #{temp_table};
         
         CREATE TEMP TABLE #{temp_table} 
