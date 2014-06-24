@@ -3,7 +3,7 @@ PATH
   specs:
     postgres-copy (0.6.0)
       activerecord (>= 3.0.0)
-      pg
+      pg (~> 0.17.0)
       rails (>= 3.0.0)
       responders
 
@@ -50,7 +50,7 @@ GEM
       treetop (~> 1.4.8)
     mime-types (1.23)
     multi_json (1.7.3)
-    pg (0.15.1)
+    pg (0.17.1)
     polyglot (0.3.3)
     rack (1.4.5)
     rack-cache (1.2)
