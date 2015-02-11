@@ -82,7 +82,7 @@ module PostgresCopy
             while line = io.gets do
               next if line.strip.size == 0
               if block_given?
-                row = line.strip.split(options[:delimiter])
+                row = line.strip.split(options[:delimiter],-1)
                 yield(row)
                 line = row.join(options[:delimiter]) + "\n"
               end
