@@ -61,7 +61,7 @@ module PostgresCopy
           columns_list = options[:columns] || []
         elsif options[:header]
           line = io.gets
-          columns_list = options[:columns] || is_csv ? line : line.strip.split(options[:delimiter])
+          columns_list = options[:columns] || (is_csv ? line : line.strip.split(options[:delimiter]))
         else
           columns_list = options[:columns]
         end
