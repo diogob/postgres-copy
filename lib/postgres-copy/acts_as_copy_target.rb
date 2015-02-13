@@ -2,6 +2,8 @@ module PostgresCopy
   module ActsAsCopyTarget
     extend ActiveSupport::Concern
 
+    require 'csv'
+
     included do
     end
 
@@ -10,10 +12,10 @@ module PostgresCopy
       def copy_to path = nil, options = {}
         options = {:delimiter => ",", :format => :csv, :header => true}.merge(options)
         options_string = if options[:format] == :binary
-                           "BINARY"
-                         else
-                           "DELIMITER '#{options[:delimiter]}' CSV #{options[:header] ? 'HEADER' : ''}"
-                         end
+          "BINARY"
+        else
+          "DELIMITER '#{options[:delimiter]}' CSV #{options[:header] ? 'HEADER' : ''}"
+        end
 
         if path
           raise "You have to choose between exporting to a file or receiving the lines inside a block" if block_given?
@@ -45,28 +47,33 @@ module PostgresCopy
       def copy_from path_or_io, options = {}
         options = {:delimiter => ",", :format => :csv, :header => true}.merge(options)
         options_string = if options[:format] == :binary
-                           "BINARY"
-                         else
-                           "DELIMITER '#{options[:delimiter]}' CSV"
-                         end
-        io = path_or_io.instance_of?(String) ? File.open(path_or_io, 'r') : path_or_io
+          "BINARY"
+        else
+          "DELIMITER '#{options[:delimiter]}' CSV"
+        end
+
+        is_csv=options[:format] == :csv
+
+        io=path_or_io.instance_of?(String) ? File.open(path_or_io, 'r') : path_or_io
+        io = CSV.new(io, col_sep: options[:delimiter] ,force_quotes: true, skip_blanks: true) if is_csv
 
         if options[:format] == :binary
           columns_list = options[:columns] || []
         elsif options[:header]
           line = io.gets
-          columns_list = options[:columns] || line.strip.split(options[:delimiter])
+          columns_list = options[:columns] || (is_csv ? line : line.strip.split(options[:delimiter]))
         else
           columns_list = options[:columns]
         end
 
         table = if options[:table]
-                  connection.quote_table_name(options[:table])
-                else
-                  quoted_table_name
-                end
+          connection.quote_table_name(options[:table])
+        else
+          quoted_table_name
+        end
 
         columns_list = columns_list.map{|c| options[:map][c.to_s] } if options[:map]
+
         columns_string = columns_list.size > 0 ? "(\"#{columns_list.join('","')}\")" : ""
         connection.raw_connection.copy_data %{COPY #{table} #{columns_string} FROM STDIN #{options_string}} do
           if options[:format] == :binary
@@ -80,16 +87,17 @@ module PostgresCopy
             end
           else
             while line = io.gets do
-              next if line.strip.size == 0
+              next if line.empty? || line.join(options[:delimiter]).blank?
+              row=line
               if block_given?
-                row = line.strip.split(options[:delimiter])
-                yield(row)
-                line = row.join(options[:delimiter]) + "\n"
+              yield(row)
               end
+              line = row.join(options[:delimiter]) + "\n"
               connection.raw_connection.put_copy_data line
             end
           end
         end
+
       end
     end
 

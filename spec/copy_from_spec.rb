@@ -4,6 +4,7 @@ describe "COPY FROM" do
   before(:each) do
     ActiveRecord::Base.connection.execute %{
       TRUNCATE TABLE test_models;
+      TRUNCATE TABLE test_extended_models;
       SELECT setval('test_models_id_seq', 1, false);
     }
   end
@@ -90,5 +91,25 @@ describe "COPY FROM" do
     ReservedWordModel.copy_from File.expand_path('spec/fixtures/reserved_words.csv'), :delimiter => "\t"
     ReservedWordModel.order(:id).map{|r| r.attributes}.should == [{"group"=>"group name", "id"=>1, "select"=>"test select"}]
   end
+  
+  it "should import even last columns have empty values" do
+    TestExtendedModel.copy_from File.expand_path('spec/fixtures/comma_with_header_empty_values_at_the_end.csv')
+    TestExtendedModel.order(:id).map{|r| r.attributes}.should == 
+      [{"id"=>1, "data"=>"test data 1", "more_data"=>nil, "other_data"=>nil, "final_data"=>nil},
+       {"id"=>2, "data"=>"test data 2", "more_data"=>"9", "other_data"=>nil, "final_data"=>nil},
+       {"id"=>3, "data"=>"test data 2", "more_data"=>"9", "other_data"=>nil, "final_data"=>"0"}]
+  end
+  
+  it "should import even last columns have empty values with block" do
+    TestExtendedModel.copy_from File.expand_path('spec/fixtures/comma_with_header_empty_values_at_the_end.csv') do |row|
+      row[4]="666"
+    end
+    TestExtendedModel.order(:id).map{|r| r.attributes}.should == 
+      [{"id"=>1, "data"=>"test data 1", "more_data"=>nil, "other_data"=>nil, "final_data"=>"666"},
+       {"id"=>2, "data"=>"test data 2", "more_data"=>"9", "other_data"=>nil, "final_data"=>"666"},
+       {"id"=>3, "data"=>"test data 2", "more_data"=>"9", "other_data"=>nil, "final_data"=>"666"}]
+  end
+
+  
 end
 
