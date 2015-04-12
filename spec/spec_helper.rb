@@ -24,8 +24,9 @@ RSpec.configure do |config|
       ActiveRecord::Base.connection.execute %{
         SET client_min_messages TO warning;
         DROP TABLE IF EXISTS test_models;
-        DROP TABLE IF EXISTS extra_fields;
+        DROP TABLE IF EXISTS test_extended_models;
         DROP TABLE IF EXISTS reserved_word_models;
+        DROP TABLE IF EXISTS extra_fields;
         CREATE TABLE test_models (id serial PRIMARY KEY, data text);
         CREATE TABLE test_extended_models (id serial PRIMARY KEY, data text, more_data text,other_data text,final_data text );
         CREATE TABLE reserved_word_models (id serial PRIMARY KEY, "select" text, "group" text);
