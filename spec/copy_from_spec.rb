@@ -110,6 +110,9 @@ describe "COPY FROM" do
        {"id"=>3, "data"=>"test data 2", "more_data"=>"9", "other_data"=>nil, "final_data"=>"666"}]
   end
 
-  
-end
+  it "should import lines with single quotes" do
+    TestModel.copy_from(File.open(File.expand_path('spec/fixtures/semicolon_with_quote.csv'), 'r'), :delimiter => ";", :quote => "'")
+    TestModel.order(:id).map{|r| r.attributes}.should == [{'id' => 1, 'data' => 'test "data" 1'}]
+  end
 
+end
