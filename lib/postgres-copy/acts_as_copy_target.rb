@@ -85,6 +85,7 @@ module PostgresCopy
               if block_given?
                 row = line.strip.split(options[:delimiter],-1)
                 yield(row)
+                next if row.all?{|f| f.nil? }
                 line = row.join(options[:delimiter]) + "\n"
               end
               connection.raw_connection.put_copy_data line
