@@ -79,6 +79,15 @@ describe "COPY FROM" do
     TestModel.order(:id).map{|r| r.attributes}.should == [{'id' => 1, 'data' => 'test data 1'}]
   end
 
+  it "should ignore all-nil rows" do
+    lambda do
+      TestModel.copy_from(File.open(File.expand_path('spec/fixtures/tab_with_error.csv'), 'r'), :delimiter => "\t") do |row|
+        0.upto(row.length) {|idx| row[idx] = nil}
+      end
+    end.should_not raise_error
+    TestModel.order(:id).map{|r| r.attributes}.should == []
+  end
+
   #we should implement this later
   #it "should raise error in malformed files" do
     #lambda do
