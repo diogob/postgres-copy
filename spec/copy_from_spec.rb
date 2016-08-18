@@ -124,4 +124,9 @@ describe "COPY FROM" do
     TestModel.order(:id).map{|r| r.attributes}.should == [{'id' => 1, 'data' => 'test "data" 1'}]
   end
 
+  it "should import lines with commas inside fields with default options" do
+    TestModel.copy_from(File.open(File.expand_path('spec/fixtures/comma_inside_field.csv'), 'r'))
+    TestModel.order(:id).map{|r| r.attributes}.should == [{'id' => 1, 'data' => 'test, again'}]
+  end
+
 end
