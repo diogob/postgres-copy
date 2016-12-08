@@ -48,7 +48,8 @@ module PostgresCopy
                            "BINARY"
                          else
                            quote = options[:quote] == "'" ? "''" : options[:quote]
-                           "DELIMITER '#{options[:delimiter]}' QUOTE '#{quote}' CSV"
+                           null = options.key?(:null) ? "NULL '#{options[:null]}'" : ''
+                           "DELIMITER '#{options[:delimiter]}' QUOTE '#{quote}' #{null} CSV"
                          end
         io = path_or_io.instance_of?(String) ? File.open(path_or_io, 'r') : path_or_io
 
