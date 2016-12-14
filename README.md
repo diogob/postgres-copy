@@ -137,6 +137,13 @@ The above extample will always change the value of the first column to "fixed st
 For each iteration of the block row receives an array with the same order as the columns in the CSV file.
 
 
+To specify NULL value you can pass the null option parameter.
+
+```ruby
+User.copy_from "/tmp/users.csv", :null => 'null'
+```
+
+
 To copy a binary formatted data file or IO object you can specify the format as binary
 
 ```ruby

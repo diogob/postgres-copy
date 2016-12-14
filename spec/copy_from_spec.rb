@@ -129,4 +129,13 @@ describe "COPY FROM" do
     TestModel.order(:id).map{|r| r.attributes}.should == [{'id' => 1, 'data' => 'test, again'}]
   end
 
+  it "should import with custom null expression from path" do
+    TestModel.copy_from File.expand_path('spec/fixtures/special_null_with_header.csv'), :null => 'NULL'
+    TestModel.order(:id).map{|r| r.attributes}.should == [{'id' => 1, 'data' => nil}]
+  end
+
+  it "should import with custom null expression from IO" do
+    TestModel.copy_from File.open(File.expand_path('spec/fixtures/special_null_with_header.csv'), 'r'), :null => 'NULL'
+    TestModel.order(:id).map{|r| r.attributes}.should == [{'id' => 1, 'data' => nil}]
+  end
 end
