@@ -5,7 +5,7 @@ $:.unshift lib unless $:.include?(lib)
 
 Gem::Specification.new do |s|
   s.name                  = "postgres-copy"
-  s.version               = "1.0.0"
+  s.version               = "1.1.0"
   s.platform              = Gem::Platform::RUBY
   s.required_ruby_version = ">= 1.9.3"
   s.authors               = ["Diogo Biazus"]
@@ -27,5 +27,6 @@ Gem::Specification.new do |s|
   s.add_development_dependency "bundler"
   s.add_development_dependency "rdoc"
   s.add_development_dependency "rspec", "~> 2.12"
+  s.add_development_dependency "rake", "~> 11.2.2"
 end
 
