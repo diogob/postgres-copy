@@ -22,7 +22,6 @@ Gem::Specification.new do |s|
 
   s.add_dependency "pg", ">= 0.17"
   s.add_dependency "activerecord", '>= 4.0'
-  s.add_dependency "rails", '>= 4.0'
   s.add_dependency "responders"
   s.add_development_dependency "bundler"
   s.add_development_dependency "rdoc"
