@@ -130,11 +130,13 @@ describe "COPY FROM" do
   end
 
   it "should import lines with commas inside fields with block given" do
-    TestModel.copy_from(File.open(File.expand_path('spec/fixtures/comma_inside_field.csv'), 'r')) do |row|
-      # since our CSV line look like this: {1,"test, again"} we expect only two elements withing row
-      row.size.should == 2
-      row[0].should == '1'
-      row[1].should == 'test, again'
+    File.open(File.expand_path('spec/fixtures/comma_inside_field.csv'), 'r') do |file|
+      TestModel.copy_from(file) do |row|
+        # since our CSV line look like this: {1,"test, again"} we expect only two elements withing row
+        row.size.should == 2
+        row[0].should == '1'
+        row[1].should == 'test, again'
+      end
     end
     TestModel.order(:id).map{|r| r.attributes}.should == [{'id' => 1, 'data' => 'test, again'}]
   end
