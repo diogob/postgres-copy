@@ -1,3 +1,5 @@
+require 'csv'
+
 module PostgresCopy
   module ActsAsCopyTarget
     extend ActiveSupport::Concern
@@ -84,10 +86,10 @@ module PostgresCopy
             while line = io.gets do
               next if line.strip.size == 0
               if block_given?
-                row = line.strip.split(options[:delimiter],-1)
+                row = CSV.parse_line(line.strip, {:col_sep => options[:delimiter]})
                 yield(row)
                 next if row.all?{|f| f.nil? }
-                line = row.join(options[:delimiter]) + "\n"
+                line = CSV.generate_line(row, {:col_sep => options[:delimiter]})
               end
               connection.raw_connection.put_copy_data line
             end
