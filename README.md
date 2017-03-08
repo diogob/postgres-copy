@@ -1,3 +1,4 @@
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/3da5056366434e779afea0a85af1f50b)](https://www.codacy.com/app/diogob/postgres-copy?utm_source=github.com&utm_medium=referral&utm_content=diogob/postgres-copy&utm_campaign=badger)
 # postgres-copy [![Build Status](https://travis-ci.org/diogob/postgres-copy.svg?branch=master)](https://travis-ci.org/diogob/postgres-copy) [![Code Climate](https://codeclimate.com/github/diogob/postgres-copy.svg)](https://codeclimate.com/github/diogob/postgres-copy)
 
 This Gem will enable your AR models to use the PostgreSQL COPY command to import/export data in CSV format.
