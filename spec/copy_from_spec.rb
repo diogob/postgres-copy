@@ -129,6 +129,16 @@ describe "COPY FROM" do
     TestModel.order(:id).map{|r| r.attributes}.should == [{'id' => 1, 'data' => 'test, again'}]
   end
 
+  it "should import lines with commas inside fields with block given" do
+    TestModel.copy_from(File.open(File.expand_path('spec/fixtures/comma_inside_field.csv'), 'r')) do |row|
+      # since our CSV line look like this: {1,"test, again"} we expect only two elements withing row
+      row.size.should == 2
+      row[0].should == '1'
+      row[1].should == 'test, again'
+    end
+    TestModel.order(:id).map{|r| r.attributes}.should == [{'id' => 1, 'data' => 'test, again'}]
+  end
+
   it "should import with custom null expression from path" do
     TestModel.copy_from File.expand_path('spec/fixtures/special_null_with_header.csv'), :null => 'NULL'
     TestModel.order(:id).map{|r| r.attributes}.should == [{'id' => 1, 'data' => nil}]
