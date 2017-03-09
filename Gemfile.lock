@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    postgres-copy (1.1.1)
+    postgres-copy (1.1.2)
       activerecord (>= 4.0)
       pg (>= 0.17)
       responders
