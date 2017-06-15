@@ -1,7 +1,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/spec_helper')
 
 describe "COPY TO" do
-  before(:all) do
+  before(:each) do
     ActiveRecord::Base.connection.execute %{
       TRUNCATE TABLE test_models;
       SELECT setval('test_models_id_seq', 1, false);
@@ -18,6 +18,36 @@ describe "COPY TO" do
     context "with tab as delimiter" do
       subject{ TestModel.copy_to_string :delimiter => "\t" }
       it{ should == File.open('spec/fixtures/tab_with_header.csv', 'r').read }
+    end
+  end
+
+  describe ".copy_to_enumerator" do
+    before(:each) do
+      TestModel.create :data => 'test data 2'
+      TestModel.create :data => 'test data 3'
+      TestModel.create :data => 'test data 4'
+    end
+
+    context "with no options" do
+      subject{ TestModel.copy_to_enumerator.to_a }
+      it{ should == File.open('spec/fixtures/comma_with_header_multi.csv', 'r').read.lines }
+    end
+
+    context "with tab as delimiter" do
+      subject{ TestModel.copy_to_enumerator(:delimiter => "\t").to_a }
+      it{ should == File.open('spec/fixtures/tab_with_header_multi.csv', 'r').read.lines }
+    end
+
+    context "with many records" do
+      context "enumerating in batches" do
+        subject{ TestModel.copy_to_enumerator(:buffer => 2).to_a }
+        it{ should == File.open('spec/fixtures/comma_with_header_multi.csv', 'r').read.lines }
+      end
+
+      context "excluding some records via a scope" do
+        subject{ TestModel.where("data not like '%3'").copy_to_enumerator.to_a }
+        it{ should == File.open('spec/fixtures/comma_with_header_and_scope.csv', 'r').read.lines }
+      end
     end
   end
 

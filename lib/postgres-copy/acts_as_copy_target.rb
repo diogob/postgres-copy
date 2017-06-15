@@ -30,6 +30,32 @@ module PostgresCopy
         return self
       end
 
+      # Create an enumerator with each line from the CSV.
+      # Note that using this directly in a controller response
+      # will perform very poorly as each line will get put
+      # into its own chunk. Joining every (eg) 100 rows together
+      # is much, much faster.
+      def copy_to_enumerator(options={})
+        buffer_lines = options.delete(:buffer_lines)
+        # Somehow, self loses its scope once inside the Enumerator
+        scope = self.current_scope || self
+        result = Enumerator.new do |y|
+          scope.copy_to(nil, options) do |line|
+            y << line
+          end
+        end
+
+        if buffer_lines.to_i > 0
+          Enumerator.new do |y|
+            result.each_slice(buffer_lines.to_i) do |slice|
+              y << slice.join
+            end
+          end
+        else
+          result
+        end
+      end
+
       # Copy all data to a single string
       def copy_to_string options = {}
         data = ''
