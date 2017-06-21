@@ -40,8 +40,12 @@ describe "COPY TO" do
 
     context "with many records" do
       context "enumerating in batches" do
-        subject{ TestModel.copy_to_enumerator(:buffer => 2).to_a }
-        it{ should == File.open('spec/fixtures/comma_with_header_multi.csv', 'r').read.lines }
+        subject{ TestModel.copy_to_enumerator(:buffer_lines => 2).to_a }
+        it do
+          expected = []
+          File.open('spec/fixtures/comma_with_header_multi.csv', 'r').read.lines.each_slice(2){|s| expected << s.join }
+          should == expected
+        end
       end
 
       context "excluding some records via a scope" do
