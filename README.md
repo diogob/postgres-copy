@@ -5,7 +5,7 @@ If you need to tranfer data between a PostgreSQL database and CSV files, the Pos
 will give you a greater performance than using the ruby CSV+INSERT commands.
 I have not found time to make accurate benchmarks, but in the use scenario where I have developed the gem
 I have had a four-fold performance gain.
-This gem was written having the Rails framework in mind, I think it could work only with active-record, 
+This gem was written having the Rails framework in mind, I think it could work only with active-record,
 but I will assume in this README that you are using Rails.
 
 ## Install
@@ -34,8 +34,9 @@ end
 
 This will add the aditiontal class methods to your model:
 
-* copy_to 
+* copy_to
 * copy_to_string
+* copy_to_enumerator
 * copy_from
 
 ### Using copy_to and copy_to_string
@@ -66,13 +67,23 @@ File.open('/tmp/users.csv', 'w') do |f|
 end
 ```
 
+Instead of yielding each line, you could return an enumerator with all users:
+```ruby
+enumerator = User.copy_to_enumerator
+```
+
+And for better performance when rendering the result of the enumerator, you can return an enumerator with blocks of 100 lines joined:
+```ruby
+enumerator = User.copy_to_enumerator(:buffer_lines => 100)
+```
+
 Or, if you have enough memory, you can read all table contents to a string using .copy_to_string
 
 ```ruby
 puts User.copy_to_string
 ```
 
-Another insteresting feature of copy_to is that it uses the scoped relation, it means that you can use ARel 
+Another insteresting feature of copy_to is that it uses the scoped relation, it means that you can use ARel
 operations to generate different CSV files according to your needs.
 Assuming we want to generate a file only with the names of users 1, 2 and 3:
 
