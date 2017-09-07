@@ -32,7 +32,7 @@ class User < ActiveRecord::Base
 end
 ```
 
-This will add the aditiontal class methods to your model:
+This will add the additional class methods to your model:
 
 * copy_to
 * copy_to_string
@@ -42,7 +42,7 @@ This will add the aditiontal class methods to your model:
 ### Using copy_to and copy_to_string
 
 You can go to the rails console and try some cool things first.
-The first and most basic use case, let's copy the enteire content of a database table to a CSV file on the database server disk.
+The first and most basic use case, let's copy the entire content of a database table to a CSV file on the database server disk.
 Assuming we have a users table and a User AR model:
 
 ```ruby
@@ -83,7 +83,7 @@ Or, if you have enough memory, you can read all table contents to a string using
 puts User.copy_to_string
 ```
 
-Another insteresting feature of copy_to is that it uses the scoped relation, it means that you can use ARel
+Another interesting feature of copy_to is that it uses the scoped relation, it means that you can use ARel
 operations to generate different CSV files according to your needs.
 Assuming we want to generate a file only with the names of users 1, 2 and 3:
 
@@ -144,7 +144,7 @@ User.copy_from "/tmp/users.csv" do |row|
 end
 ```
 
-The above extample will always change the value of the first column to "fixed string" before storing it into the database.
+The above example will always change the value of the first column to "fixed string" before storing it into the database.
 For each iteration of the block row receives an array with the same order as the columns in the CSV file.
 
 
