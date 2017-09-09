@@ -19,7 +19,7 @@ module PostgresCopy
 
         if path
           raise "You have to choose between exporting to a file or receiving the lines inside a block" if block_given?
-          connection.execute "COPY (#{self.all.to_sql}) TO #{sanitize(path)} WITH #{options_string}"
+          connection.execute "COPY (#{self.all.to_sql}) TO '#{sanitize_sql(path)}' WITH #{options_string}"
         else
           connection.raw_connection.copy_data "COPY (#{self.all.to_sql}) TO STDOUT WITH #{options_string}" do
             while line = connection.raw_connection.get_copy_data do
