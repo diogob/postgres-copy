@@ -16,12 +16,13 @@ module PostgresCopy
                          else
                            "DELIMITER '#{options[:delimiter]}' CSV #{options[:header] ? 'HEADER' : ''}"
                          end
+        options_query = options.delete(:query) || self.all.to_sql
 
         if path
           raise "You have to choose between exporting to a file or receiving the lines inside a block" if block_given?
-          connection.execute "COPY (#{self.all.to_sql}) TO '#{sanitize_sql(path)}' WITH #{options_string}"
+          connection.execute "COPY (#{options_query}) TO '#{sanitize_sql(path)}' WITH #{options_string}"
         else
-          connection.raw_connection.copy_data "COPY (#{self.all.to_sql}) TO STDOUT WITH #{options_string}" do
+          connection.raw_connection.copy_data "COPY (#{options_query}) TO STDOUT WITH #{options_string}" do
             while line = connection.raw_connection.get_copy_data do
               yield(line) if block_given?
             end
