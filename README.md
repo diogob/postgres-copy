@@ -97,6 +97,18 @@ Which will generate the following SQL command:
 COPY (SELECT name FROM "users" WHERE "users"."id" IN (1, 2, 3)) TO '/tmp/users.csv' WITH DELIMITER ',' CSV HEADER
 ```
 
+Alternatively, you can supply customized raw SQL query to copy_to instead of scoped relation:
+
+```ruby
+User.copy_to("/tmp/users.csv", query: 'SELECT count(*) as Total FROM users')
+```
+
+Which will generate the following SQL command:
+
+```sql
+COPY (SELECT count(*) as Total FROM users) TO '/tmp/users.csv' WITH DELIMITER ',' CSV HEADER
+```
+
 The COPY command also supports exporting the data in binary format.
 
 ```ruby
