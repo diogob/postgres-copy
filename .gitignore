@@ -23,3 +23,7 @@ pkg
 
 ## PROJECT::SPECIFIC
 .project
+
+# RVM files
+.ruby-version
+.ruby-gemset

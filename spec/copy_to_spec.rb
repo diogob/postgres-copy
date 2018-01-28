@@ -5,7 +5,7 @@ describe "COPY TO" do
     ActiveRecord::Base.connection.execute %{
       TRUNCATE TABLE test_models;
       SELECT setval('test_models_id_seq', 1, false);
-}
+    }
     TestModel.create :data => 'test data 1'
   end
 
@@ -78,6 +78,12 @@ describe "COPY TO" do
         TestModel.copy_to('/tmp/bogus_path') do |row|
         end
       end.should raise_error
+    end
+
+    it "accepts custom sql query to run instead on the current relation" do
+      TestModel.copy_to '/tmp/export.csv', query: 'SELECT count(*) as "Total" FROM test_models'
+      content = File.open('/tmp/export.csv', 'r').read
+      expect(content).to eq("Total\n1\n")
     end
   end
 end
