@@ -77,8 +77,9 @@ module PostgresCopy
                            "BINARY"
                          else
                            quote = options[:quote] == "'" ? "''" : options[:quote]
-                           null = options.key?(:null) ? "NULL '#{options[:null]}'" : ''
-                           "DELIMITER '#{options[:delimiter]}' QUOTE '#{quote}' #{null} CSV"
+                           null = options.key?(:null) ? "NULL '#{options[:null]}'" : nil
+                           force_null = options.key?(:force_null) ? "FORCE_NULL(#{options[:force_null].join(',')})" : nil
+                           "WITH (" + ["DELIMITER '#{options[:delimiter]}'", "QUOTE '#{quote}'", null, force_null, "FORMAT CSV"].compact.join(', ') + ")"
                          end
         io = path_or_io.instance_of?(String) ? File.open(path_or_io, 'r') : path_or_io
 
@@ -110,15 +111,31 @@ module PostgresCopy
             rescue EOFError
             end
           else
+            line_buffer = ''
+
             while line = io.gets do
               next if line.strip.size == 0
-              if block_given?
-                row = CSV.parse_line(line.strip, {:col_sep => options[:delimiter]})
-                yield(row)
-                next if row.all?{|f| f.nil? }
-                line = CSV.generate_line(row, {:col_sep => options[:delimiter]})
+
+              line_buffer += line
+
+              # If line is incomplete, get the next line until it terminates
+              if line_buffer =~ /\n$/ || line_buffer =~ /\Z/
+                if block_given?
+                  begin
+                    row = CSV.parse_line(line_buffer.strip, {:col_sep => options[:delimiter]})
+                    yield(row)
+                    next if row.all?{|f| f.nil? }
+                    line_buffer = CSV.generate_line(row, {:col_sep => options[:delimiter]})
+                  rescue CSV::MalformedCSVError => e
+                    next
+                  end
+                end
+
+                connection.raw_connection.put_copy_data(line_buffer)
+
+                # Clear the buffer
+                line_buffer = ''
               end
-              connection.raw_connection.put_copy_data line
             end
           end
         end
