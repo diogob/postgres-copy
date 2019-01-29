@@ -126,7 +126,7 @@ module PostgresCopy
                     yield(row)
                     next if row.all?{|f| f.nil? }
                     line_buffer = CSV.generate_line(row, {:col_sep => options[:delimiter]})
-                  rescue CSV::MalformedCSVError => e
+                  rescue CSV::MalformedCSVError
                     next
                   end
                 end
