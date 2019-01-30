@@ -55,8 +55,8 @@ This will execute in the database the command:
 COPY (SELECT "users".* FROM "users" ) TO '/tmp/users.csv' WITH DELIMITER ',' CSV HEADER
 ```
 
-Remark that the file will be created in the database server disk.  
-But what if you want to write the lines in a file on the server that is running Rails, instead of the database?  
+Remark that the file will be created in the database server disk.
+But what if you want to write the lines in a file on the server that is running Rails, instead of the database?
 In this case you can pass a block and retrieve the generated lines and then write them to a file:
 
 ```ruby
@@ -164,6 +164,12 @@ To specify NULL value you can pass the null option parameter.
 
 ```ruby
 User.copy_from "/tmp/users.csv", :null => 'null'
+```
+
+Match the specified columns' values against the null string, even if it has been quoted, and if a match is found set the value to NULL (Postgres 9.4+ only).
+
+```ruby
+User.copy_from "/tmp/users.csv", :null => '', :force_null => [:name, :city]
 ```
 
 

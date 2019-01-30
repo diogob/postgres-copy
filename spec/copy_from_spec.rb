@@ -100,20 +100,20 @@ describe "COPY FROM" do
     ReservedWordModel.copy_from File.expand_path('spec/fixtures/reserved_words.csv'), :delimiter => "\t"
     ReservedWordModel.order(:id).map{|r| r.attributes}.should == [{"group"=>"group name", "id"=>1, "select"=>"test select"}]
   end
-  
+
   it "should import even last columns have empty values" do
     TestExtendedModel.copy_from File.expand_path('spec/fixtures/comma_with_header_empty_values_at_the_end.csv')
-    TestExtendedModel.order(:id).map{|r| r.attributes}.should == 
+    TestExtendedModel.order(:id).map{|r| r.attributes}.should ==
       [{"id"=>1, "data"=>"test data 1", "more_data"=>nil, "other_data"=>nil, "final_data"=>nil},
        {"id"=>2, "data"=>"test data 2", "more_data"=>"9", "other_data"=>nil, "final_data"=>nil},
        {"id"=>3, "data"=>"test data 2", "more_data"=>"9", "other_data"=>nil, "final_data"=>"0"}]
   end
-  
+
   it "should import even last columns have empty values with block" do
     TestExtendedModel.copy_from File.expand_path('spec/fixtures/comma_with_header_empty_values_at_the_end.csv') do |row|
       row[4]="666"
     end
-    TestExtendedModel.order(:id).map{|r| r.attributes}.should == 
+    TestExtendedModel.order(:id).map{|r| r.attributes}.should ==
       [{"id"=>1, "data"=>"test data 1", "more_data"=>nil, "other_data"=>nil, "final_data"=>"666"},
        {"id"=>2, "data"=>"test data 2", "more_data"=>"9", "other_data"=>nil, "final_data"=>"666"},
        {"id"=>3, "data"=>"test data 2", "more_data"=>"9", "other_data"=>nil, "final_data"=>"666"}]
@@ -148,6 +148,16 @@ describe "COPY FROM" do
 
   it "should import with custom null expression from IO" do
     TestModel.copy_from File.open(File.expand_path('spec/fixtures/special_null_with_header.csv'), 'r'), :null => 'NULL'
+    TestModel.order(:id).map{|r| r.attributes}.should == [{'id' => 1, 'data' => nil}]
+  end
+
+  it "should import with a carriage return in the value" do
+    TestModel.copy_from File.expand_path('spec/fixtures/comma_with_carriage_returns.csv')
+    TestModel.order(:id).map{|r| r.attributes}.should == [{'id' => 1, 'data' => "test\ndata 1"}]
+  end
+
+  it "should import custom force null expressions from path" do
+    TestModel.copy_from File.expand_path('spec/fixtures/comma_with_empty_string.csv'), :null => '', :force_null => [:data]
     TestModel.order(:id).map{|r| r.attributes}.should == [{'id' => 1, 'data' => nil}]
   end
 end
