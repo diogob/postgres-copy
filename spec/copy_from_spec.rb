@@ -160,4 +160,17 @@ describe "COPY FROM" do
     TestModel.copy_from File.expand_path('spec/fixtures/comma_with_empty_string.csv'), :null => '', :force_null => [:data]
     TestModel.order(:id).map{|r| r.attributes}.should == [{'id' => 1, 'data' => nil}]
   end
+
+  it "should import tsv from path" do
+    TestModel.copy_from File.expand_path('spec/fixtures/tab_with_header.tsv'), :format => :tsv
+    TestModel.order(:id).map{|r| r.attributes}.should == [{'id' => 1, 'data' => 'test data 1'}]
+  end
+
+  it "should import 2 lines from tsv and allow changes in block" do
+    TestModel.copy_from(File.open(File.expand_path('spec/fixtures/tab_with_two_lines.tsv'), 'r'), :format => :tsv) do |row|
+      row[1] = 'changed this data'
+    end
+    TestModel.order(:id).first.attributes.should == {'id' => 1, 'data' => 'changed this data'}
+    TestModel.count.should == 2
+  end
 end

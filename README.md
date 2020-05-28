@@ -172,6 +172,11 @@ Match the specified columns' values against the null string, even if it has been
 User.copy_from "/tmp/users.csv", :null => '', :force_null => [:name, :city]
 ```
 
+To copy from tsv file , you can set format `:tsv`
+
+```ruby
+User.copy_from "/tmp/users.tsv", :format => :tsv
+```
 
 To copy a binary formatted data file or IO object you can specify the format as binary
 
