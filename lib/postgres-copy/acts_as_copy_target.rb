@@ -73,13 +73,15 @@ module PostgresCopy
       # * For further details on usage take a look at the README.md
       def copy_from path_or_io, options = {}
         options = {:delimiter => ",", :format => :csv, :header => true, :quote => '"'}.merge(options)
+        options[:delimiter] = "\t" if options[:format] == :tsv
         options_string = if options[:format] == :binary
                            "BINARY"
                          else
                            quote = options[:quote] == "'" ? "''" : options[:quote]
                            null = options.key?(:null) ? "NULL '#{options[:null]}'" : nil
                            force_null = options.key?(:force_null) ? "FORCE_NULL(#{options[:force_null].join(',')})" : nil
-                           "WITH (" + ["DELIMITER '#{options[:delimiter]}'", "QUOTE '#{quote}'", null, force_null, "FORMAT CSV"].compact.join(', ') + ")"
+                           delimiter = options[:format] == :tsv ? "E'\t'" : "'#{options[:delimiter]}'"
+                           "WITH (" + ["DELIMITER #{delimiter}", "QUOTE '#{quote}'", null, force_null, "FORMAT CSV"].compact.join(', ') + ")"
                          end
         io = path_or_io.instance_of?(String) ? File.open(path_or_io, 'r') : path_or_io
 
