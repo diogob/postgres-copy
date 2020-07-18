@@ -64,15 +64,6 @@ describe "COPY TO" do
       end
     end
 
-    it "should copy to disk if block is not given and a path is passed" do
-      TestModel.copy_to '/tmp/export.csv'
-      File.open('spec/fixtures/comma_with_header.csv', 'r') do |fixture|
-        File.open('/tmp/export.csv', 'r') do |result|
-          result.read.should == fixture.read
-        end
-      end
-    end
-
     it "should raise exception if I pass a path and a block simultaneously" do
       lambda do
         TestModel.copy_to('/tmp/bogus_path') do |row|
@@ -81,9 +72,10 @@ describe "COPY TO" do
     end
 
     it "accepts custom sql query to run instead on the current relation" do
-      TestModel.copy_to '/tmp/export.csv', query: 'SELECT count(*) as "Total" FROM test_models'
-      content = File.open('/tmp/export.csv', 'r').read
-      expect(content).to eq("Total\n1\n")
+      TestModel.copy_to(nil, query: 'SELECT count(*) as "Total" FROM test_models') do |row|
+        expect(row).to eq("Total\n")
+        break
+      end
     end
   end
 end
