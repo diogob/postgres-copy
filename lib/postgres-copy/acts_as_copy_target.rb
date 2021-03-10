@@ -16,7 +16,7 @@ module PostgresCopy
                          else
                            "DELIMITER '#{options[:delimiter]}' CSV #{options[:header] ? 'HEADER' : ''}"
                          end
-        options_query = options.delete(:query) || self.all.to_sql
+        options_query = options[:query] || self.all.to_sql
 
         if path
           raise "You have to choose between exporting to a file or receiving the lines inside a block" if block_given?
@@ -37,7 +37,7 @@ module PostgresCopy
       # into its own chunk. Joining every (eg) 100 rows together
       # is much, much faster.
       def copy_to_enumerator(options={})
-        buffer_lines = options.delete(:buffer_lines)
+        buffer_lines = options[:buffer_lines]
         # Somehow, self loses its scope once inside the Enumerator
         scope = self.current_scope || self
         result = Enumerator.new do |y|
@@ -121,7 +121,7 @@ module PostgresCopy
               line_buffer += line
 
               # If line is incomplete, get the next line until it terminates
-              if line_buffer =~ /\n$/ || line_buffer =~ /\Z/
+              if line_buffer =~ /\n$|\Z/
                 if block_given?
                   begin
                     row = CSV.parse_line(line_buffer.strip, {:col_sep => options[:delimiter]})
