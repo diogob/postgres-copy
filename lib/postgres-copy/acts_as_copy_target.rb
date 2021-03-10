@@ -11,11 +11,7 @@ module PostgresCopy
       # Copy data to a file passed as a string (the file path) or to lines that are passed to a block
       def copy_to path = nil, options = {}
         options = {:delimiter => ",", :format => :csv, :header => true}.merge(options)
-        options_string = if options[:format] == :binary
-                           "BINARY"
-                         else
-                           "DELIMITER '#{options[:delimiter]}' CSV #{options[:header] ? 'HEADER' : ''}"
-                         end
+        options_string = generate_options_string(options)
         options_query = options[:query] || self.all.to_sql
 
         if path
@@ -141,6 +137,13 @@ module PostgresCopy
             end
           end
         end
+      end
+
+      private
+
+      def generate_options_string(options)
+        return "BINARY" if options[:format] == :binary
+        "DELIMITER '#{options[:delimiter]}' CSV #{options[:header] ? 'HEADER' : ''}"
       end
     end
 
