@@ -117,7 +117,7 @@ module PostgresCopy
         begin
           while line = io.readpartial(10240)
             connection.raw_connection.put_copy_data line
-            # bytes += line.bytesize
+            bytes += line.bytesize
           end
         rescue EOFError
         end
