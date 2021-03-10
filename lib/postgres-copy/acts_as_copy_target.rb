@@ -67,7 +67,7 @@ module PostgresCopy
       # * You can change the default delimiter passing delimiter: '' in the options hash
       # * You can map fields from the file to different fields in the table using a map in the options hash
       # * For further details on usage take a look at the README.md
-      def copy_from path_or_io, options = {}
+      def copy_from path_or_io, options = {}, &block
         options = {:delimiter => ",", :format => :csv, :header => true, :quote => '"'}.merge(options)
         options[:delimiter] = "\t" if options[:format] == :tsv
         options_string = generate_options_string(options, scope: :copy_from)
@@ -82,51 +82,15 @@ module PostgresCopy
           columns_list = options[:columns]
         end
 
-        table = if options[:table]
-                  connection.quote_table_name(options[:table])
-                else
-                  quoted_table_name
-                end
+        table = options[:table] ? connection.quote_table_name(options[:table]) : quoted_table_name
 
         columns_list = columns_list.map{|c| options[:map][c.to_s] } if options[:map]
         columns_string = columns_list.size > 0 ? "(\"#{columns_list.join('","')}\")" : ""
         connection.raw_connection.copy_data %{COPY #{table} #{columns_string} FROM STDIN #{options_string}} do
           if options[:format] == :binary
-            bytes = 0
-            begin
-              while line = io.readpartial(10240)
-                connection.raw_connection.put_copy_data line
-                bytes += line.bytesize
-              end
-            rescue EOFError
-            end
+            copy_binary_data(io)
           else
-            line_buffer = ''
-
-            while line = io.gets do
-              next if line.strip.size == 0
-
-              line_buffer += line
-
-              # If line is incomplete, get the next line until it terminates
-              if line_buffer =~ /\n$|\Z/
-                if block_given?
-                  begin
-                    row = CSV.parse_line(line_buffer.strip, {:col_sep => options[:delimiter]})
-                    yield(row)
-                    next if row.all?{|f| f.nil? }
-                    line_buffer = CSV.generate_line(row, {:col_sep => options[:delimiter]})
-                  rescue CSV::MalformedCSVError
-                    next
-                  end
-                end
-
-                connection.raw_connection.put_copy_data(line_buffer)
-
-                # Clear the buffer
-                line_buffer = ''
-              end
-            end
+            copy_non_binary_data(io, options, &block)
           end
         end
       end
@@ -145,6 +109,46 @@ module PostgresCopy
           delimiter = options[:format] == :tsv ? "E'\t'" : "'#{options[:delimiter]}'"
 
           return "WITH (" + ["DELIMITER #{delimiter}", "QUOTE '#{quote}'", null, force_null, "FORMAT CSV"].compact.join(', ') + ")"
+        end
+      end
+
+      def copy_binary_data(io)
+        bytes = 0
+        begin
+          while line = io.readpartial(10240)
+            connection.raw_connection.put_copy_data line
+            # bytes += line.bytesize
+          end
+        rescue EOFError
+        end
+      end
+
+      def copy_non_binary_data(io, options, &block)
+        line_buffer = ''
+
+        while line = io.gets do
+          next if line.strip.size == 0
+
+          line_buffer += line
+
+          # If line is incomplete, get the next line until it terminates
+          if line_buffer =~ /\n$|\Z/
+            if block_given?
+              begin
+                row = CSV.parse_line(line_buffer.strip, {:col_sep => options[:delimiter]})
+                yield(row)
+                next if row.all?{|f| f.nil? }
+                line_buffer = CSV.generate_line(row, {:col_sep => options[:delimiter]})
+              rescue CSV::MalformedCSVError
+                next
+              end
+            end
+
+            connection.raw_connection.put_copy_data(line_buffer)
+
+            # Clear the buffer
+            line_buffer = ''
+          end
         end
       end
     end
