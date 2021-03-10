@@ -11,7 +11,7 @@ module PostgresCopy
       # Copy data to a file passed as a string (the file path) or to lines that are passed to a block
       def copy_to path = nil, options = {}
         options = {:delimiter => ",", :format => :csv, :header => true}.merge(options)
-        options_string = generate_options_string(options)
+        options_string = generate_options_string(options, scope: :copy_to)
         options_query = options[:query] || self.all.to_sql
 
         if path
@@ -70,15 +70,7 @@ module PostgresCopy
       def copy_from path_or_io, options = {}
         options = {:delimiter => ",", :format => :csv, :header => true, :quote => '"'}.merge(options)
         options[:delimiter] = "\t" if options[:format] == :tsv
-        options_string = if options[:format] == :binary
-                           "BINARY"
-                         else
-                           quote = options[:quote] == "'" ? "''" : options[:quote]
-                           null = options.key?(:null) ? "NULL '#{options[:null]}'" : nil
-                           force_null = options.key?(:force_null) ? "FORCE_NULL(#{options[:force_null].join(',')})" : nil
-                           delimiter = options[:format] == :tsv ? "E'\t'" : "'#{options[:delimiter]}'"
-                           "WITH (" + ["DELIMITER #{delimiter}", "QUOTE '#{quote}'", null, force_null, "FORMAT CSV"].compact.join(', ') + ")"
-                         end
+        options_string = generate_options_string(options, scope: :copy_from)
         io = path_or_io.instance_of?(String) ? File.open(path_or_io, 'r') : path_or_io
 
         if options[:format] == :binary
@@ -141,9 +133,19 @@ module PostgresCopy
 
       private
 
-      def generate_options_string(options)
+      def generate_options_string(options, scope: nil)
         return "BINARY" if options[:format] == :binary
-        "DELIMITER '#{options[:delimiter]}' CSV #{options[:header] ? 'HEADER' : ''}"
+
+        if scope == :copy_to
+          return "DELIMITER '#{options[:delimiter]}' CSV #{options[:header] ? 'HEADER' : ''}"
+        elsif scope == :copy_from
+          quote = options[:quote] == "'" ? "''" : options[:quote]
+          null = options.key?(:null) ? "NULL '#{options[:null]}'" : nil
+          force_null = options.key?(:force_null) ? "FORCE_NULL(#{options[:force_null].join(',')})" : nil
+          delimiter = options[:format] == :tsv ? "E'\t'" : "'#{options[:delimiter]}'"
+
+          return "WITH (" + ["DELIMITER #{delimiter}", "QUOTE '#{quote}'", null, force_null, "FORMAT CSV"].compact.join(', ') + ")"
+        end
       end
     end
 
