@@ -4,25 +4,25 @@ module PostgresCopy
   module ActsAsCopyTarget
     extend ActiveSupport::Concern
 
+    # não achei utilidade, então vou remover esse included. os testes passaram.
     included do
     end
 
     module CopyMethods
       # Copy data to a file passed as a string (the file path) or to lines that are passed to a block
-      def copy_to path = nil, options = {}
-        options = {:delimiter => ",", :format => :csv, :header => true}.merge(options)
-        options_string = if options[:format] == :binary
+      # **_ é para manter a retrocompatibilidade
+      def copy_to(path = nil, delimiter: ",", format: :csv, header: true, query: self.all.to_sql, **_)
+        options_string = if format == :binary
                            "BINARY"
                          else
-                           "DELIMITER '#{options[:delimiter]}' CSV #{options[:header] ? 'HEADER' : ''}"
+                           "DELIMITER '#{delimiter}' CSV #{header ? 'HEADER' : ''}"
                          end
-        options_query = options[:query] || self.all.to_sql
 
         if path
           raise "You have to choose between exporting to a file or receiving the lines inside a block" if block_given?
-          connection.execute "COPY (#{options_query}) TO '#{sanitize_sql(path)}' WITH #{options_string}"
+          connection.execute "COPY (#{query}) TO '#{sanitize_sql(path)}' WITH #{options_string}"
         else
-          connection.raw_connection.copy_data "COPY (#{options_query}) TO STDOUT WITH #{options_string}" do
+          connection.raw_connection.copy_data "COPY (#{query}) TO STDOUT WITH #{options_string}" do
             while line = connection.raw_connection.get_copy_data do
               yield(line) if block_given?
             end
@@ -121,7 +121,8 @@ module PostgresCopy
               line_buffer += line
 
               # If line is incomplete, get the next line until it terminates
-              if line_buffer =~ /\n$|\Z/
+              if line_buffer =~ /\n$/ || line_buffer =~ /\Z/
+              # if line_buffer =~ /\n$|\Z/
                 if block_given?
                   begin
                     row = CSV.parse_line(line_buffer.strip, {:col_sep => options[:delimiter]})
