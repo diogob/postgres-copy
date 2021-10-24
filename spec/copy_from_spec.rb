@@ -173,4 +173,10 @@ describe "COPY FROM" do
     TestModel.order(:id).first.attributes.should == {'id' => 1, 'data' => 'changed this data'}
     TestModel.count.should == 2
   end
+
+  it "should import csv headers with BOM when provided encoding option" do
+    TestModel.copy_from File.expand_path("spec/fixtures/comma_with_bom.csv"), :encoding => "bom|utf-8"
+    TestModel.order(:id).map{|r| r.attributes}.should == [{'id' => 1, 'data' => 'test data 1'}]
+  end
+
 end
