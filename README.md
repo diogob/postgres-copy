@@ -200,6 +200,13 @@ Which will generate the following SQL command:
 COPY users (id, name) FROM '/tmp/users.dat' WITH BINARY
 ```
 
+To specify the encoding with which to read the file, set the :encoding option.
+This is useful for removing byte order marks when matching column headers.
+
+```ruby
+User.copy_from "/tmp/users_with_byte_order_mark.csv", :encoding => 'bom|utf-8'
+```
+
 
 ### Using the CSV Responder
 If you want to make the result of a COPY command available to download this gem provides a CSV responder that, in conjunction with [inherited_resources](https://github.com/josevalim/inherited_resources), is a very powerfull tool. BTW, do not try to use the responder without inherited_resources.
