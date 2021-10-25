@@ -1,5 +1,13 @@
 require 'csv'
 
+def get_file_mode mode, encoding = nil
+  if encoding
+    "#{mode}:#{encoding}"
+  else
+    mode
+  end
+end
+
 module PostgresCopy
   module ActsAsCopyTarget
     extend ActiveSupport::Concern
@@ -83,7 +91,7 @@ module PostgresCopy
                            delimiter = options[:format] == :tsv ? "E'\t'" : "'#{options[:delimiter]}'"
                            "WITH (" + ["DELIMITER #{delimiter}", "QUOTE '#{quote}'", null, force_null, "FORMAT CSV"].compact.join(', ') + ")"
                          end
-        io = path_or_io.instance_of?(String) ? File.open(path_or_io, 'r') : path_or_io
+        io = path_or_io.instance_of?(String) ? File.open(path_or_io, get_file_mode('r', options[:encoding])) : path_or_io
 
         if options[:format] == :binary
           columns_list = options[:columns] || []
