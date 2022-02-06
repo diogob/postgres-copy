@@ -45,7 +45,7 @@ GEM
       nokogiri (>= 1.5.9)
     method_source (1.0.0)
     mini_portile2 (2.4.0)
-    minitest (5.14.1)
+    minitest (5.15.0)
     nokogiri (1.10.10)
       mini_portile2 (~> 2.4.0)
     pg (1.2.3)
@@ -93,4 +93,4 @@ DEPENDENCIES
   rspec (~> 2.12)
 
 BUNDLED WITH
-   2.1.2
+   2.2.22
