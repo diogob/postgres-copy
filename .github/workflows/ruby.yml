@@ -36,7 +36,7 @@ jobs:
     name: test (ruby v${{ matrix.ruby }})
     strategy:
       matrix:
-        ruby: ["2.6", "2.7", "3.0", "3.1"]
+        ruby: ["2.7", "3.0", "3.1"]
 
     steps:
     - uses: actions/checkout@v2
