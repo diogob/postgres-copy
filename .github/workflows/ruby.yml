@@ -33,6 +33,10 @@ jobs:
           --health-retries 5
 
     runs-on: ubuntu-latest
+    name: test (ruby v${{ matrix.ruby }})
+    strategy:
+      matrix:
+        ruby: ["2.6", "2.7", "3.0", "3.1"]
 
     steps:
     - uses: actions/checkout@v2
@@ -41,7 +45,8 @@ jobs:
     # change this to (see https://github.com/ruby/setup-ruby#versioning):
       uses: ruby/setup-ruby@v1
       with:
-        ruby-version: 2.7
+        ruby-version: ${{ matrix.ruby }}
+        bundler-cache: true
     - name: Install dependencies
       run: bundle install
     - name: Run tests

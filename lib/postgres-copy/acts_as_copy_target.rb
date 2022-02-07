@@ -18,7 +18,7 @@ module PostgresCopy
     module CopyMethods
       # Copy data to a file passed as a string (the file path) or to lines that are passed to a block
       def copy_to path = nil, options = {}
-        options = {:delimiter => ",", :format => :csv, :header => true}.merge(options)
+        options = { delimiter: ",", format: :csv, header: true }.merge(options)
         options_string = if options[:format] == :binary
                            "BINARY"
                          else
@@ -80,7 +80,7 @@ module PostgresCopy
       # * You can map fields from the file to different fields in the table using a map in the options hash
       # * For further details on usage take a look at the README.md
       def copy_from path_or_io, options = {}
-        options = {:delimiter => ",", :format => :csv, :header => true, :quote => '"'}.merge(options)
+        options = { delimiter: ",", format: :csv, header: true, quote: '"' }.merge(options)
         options[:delimiter] = "\t" if options[:format] == :tsv
         options_string = if options[:format] == :binary
                            "BINARY"
@@ -132,10 +132,10 @@ module PostgresCopy
               if line_buffer =~ /\n$/ || line_buffer =~ /\Z/
                 if block_given?
                   begin
-                    row = CSV.parse_line(line_buffer.strip, {:col_sep => options[:delimiter]})
+                    row = CSV.parse_line(line_buffer.strip, col_sep: options[:delimiter])
                     yield(row)
-                    next if row.all?{|f| f.nil? }
-                    line_buffer = CSV.generate_line(row, {:col_sep => options[:delimiter]})
+                    next if row.all?(&:nil?)
+                    line_buffer = CSV.generate_line(row, col_sep: options[:delimiter])
                   rescue CSV::MalformedCSVError
                     next
                   end
