@@ -14,6 +14,12 @@ describe "COPY FROM" do
     TestModel.order(:id).map{|r| r.attributes}.should == [{'id' => 1, 'data' => 'test data 1'}]
   end
 
+  it "should import from file if path is with a field_map" do
+    TestModel.copy_from File.expand_path('spec/fixtures/comma_with_header_to_map.csv'), map: {'ref' => 'id'}
+    TestModel.order(:id).map{|r| r.attributes}.should == [{'id' => 1, 'data' => 'test data 1'}]
+  end
+
+
   it "should import from IO without field_map" do
     TestModel.copy_from File.open(File.expand_path('spec/fixtures/comma_with_header.csv'), 'r')
     TestModel.order(:id).map{|r| r.attributes}.should == [{'id' => 1, 'data' => 'test data 1'}]
