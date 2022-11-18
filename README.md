@@ -1,4 +1,4 @@
-# postgres-copy 
+# postgres-copy
 
 ![Ruby](https://github.com/diogob/postgres-copy/workflows/Ruby/badge.svg)
 
@@ -207,6 +207,19 @@ This is useful for removing byte order marks when matching column headers.
 User.copy_from "/tmp/users_with_byte_order_mark.csv", :encoding => 'bom|utf-8'
 ```
 
+### Using PostgresCopy::WithTempTable.generate
+
+Based on [nfedyashev](https://github.com/nfedyashev)'s [comment](https://github.com/diogob/postgres-copy/issues/51):
+
+```ruby
+    PostgresCopy::WithTempTable.generate do |t|
+      columns.each do |column_name|
+        t.string column_name.to_sym
+      end
+    end
+```
+
+This auto-generates an id column, but the temp table creation is configurable.
 
 ### Using the CSV Responder
 If you want to make the result of a COPY command available to download this gem provides a CSV responder that, in conjunction with [inherited_resources](https://github.com/josevalim/inherited_resources), is a very powerfull tool. BTW, do not try to use the responder without inherited_resources.
