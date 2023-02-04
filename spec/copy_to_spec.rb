@@ -80,23 +80,27 @@ describe "COPY TO" do
 
     context "when ascii encoding is given as argument" do
       it "saves file with ascii encoding" do
-        file_path = '/tmp/encoding.csv'
+        file_path = File.join(File.dirname(__FILE__), 'fixtures/encoding.csv')
 
         TestModel.copy_to file_path, encoding: "SQL_ASCII", query: 'SELECT count(*) as "Total" FROM test_models'
         encoding = `file --mime #{file_path}`.strip.split('charset=').last
 
         expect(encoding).to eq("us-ascii")
+
+        File.write(file_path, "")
       end
     end
 
     context "when no encoding argument is given" do
       it "defaults to utf8 encoding" do
-        file_path = '/tmp/encoding.csv'
+        file_path = File.join(File.dirname(__FILE__), 'fixtures/encoding.csv')
 
         TestModel.copy_to file_path, query: 'SELECT count(*) as "全部的" FROM test_models'
         encoding = `file --mime #{file_path}`.strip.split('charset=').last
 
         expect(encoding).to eq("utf-8")
+
+        File.write(file_path, "")
       end
     end
   end
