@@ -22,6 +22,7 @@ Gem::Specification.new do |s|
 
   s.add_dependency "pg", ">= 0.17"
   s.add_dependency "activerecord", '>= 5.1'
+  s.add_dependency "csv"
   s.add_development_dependency "bundler"
   s.add_development_dependency "rdoc"
   s.add_development_dependency "rspec", "~> 3.0"
