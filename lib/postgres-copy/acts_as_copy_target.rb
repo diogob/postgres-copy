@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'csv'
 
 def get_file_mode mode, encoding = nil
@@ -67,7 +69,7 @@ module PostgresCopy
 
       # Copy all data to a single string
       def copy_to_string options = {}
-        data = ''
+        data = +''
         self.copy_to(nil, options){|l| data << l }
         if options[:format] == :binary
           data.force_encoding("ASCII-8BIT")
